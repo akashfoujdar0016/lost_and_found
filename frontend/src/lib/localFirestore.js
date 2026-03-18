@@ -39,8 +39,8 @@ class DocSnapshot {
     constructor(id, data = null) {
         this.id = id;
         this._data = data;
-        this.exists = !!data;
     }
+    exists() { return !!this._data; }
     data() { return this._data; }
 }
 
