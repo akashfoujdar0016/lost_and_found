@@ -46,6 +46,19 @@ if (!mongodbUri) {
         .catch(err => console.error('MongoDB connection error:', err));
 }
 
+// Health Check Route
+app.get('/api/health', async (req, res) => {
+    res.json({
+        status: 'ok',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        env: {
+            has_mongo_uri: !!process.env.MONGODB_URI,
+            has_jwt_secret: !!process.env.JWT_SECRET,
+            node_env: process.env.NODE_ENV
+        }
+    });
+});
+
 // --- Routes ---
 
 // Items Routes
