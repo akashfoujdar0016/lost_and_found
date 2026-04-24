@@ -46,15 +46,16 @@ if (!mongodbUri) {
         .catch(err => console.error('MongoDB connection error:', err));
 }
 
-// Health Check Route
-app.get('/api/health', async (req, res) => {
+// Health Check Route (responds to both /api/health and /health)
+app.get(['/api/health', '/health'], async (req, res) => {
     res.json({
         status: 'ok',
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        readyState: mongoose.connection.readyState,
         env: {
             has_mongo_uri: !!process.env.MONGODB_URI,
             has_jwt_secret: !!process.env.JWT_SECRET,
-            node_env: process.env.NODE_ENV
+            node_env: process.env.NODE_ENV?.trim()
         }
     });
 });
@@ -62,7 +63,7 @@ app.get('/api/health', async (req, res) => {
 // --- Routes ---
 
 // Items Routes
-app.get('/api/items', async (req, res) => {
+app.get(['/api/items', '/items'], async (req, res) => {
     try {
         const { type, category, status } = req.query;
         const filter = {};
@@ -79,7 +80,7 @@ app.get('/api/items', async (req, res) => {
     }
 });
 
-app.get('/api/items/latest', async (req, res) => {
+app.get(['/api/items/latest', '/items/latest'], async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3;
         const items = await Item.find()
@@ -92,7 +93,7 @@ app.get('/api/items/latest', async (req, res) => {
     }
 });
 
-app.get('/api/items/:id', async (req, res) => {
+app.get(['/api/items/:id', '/items/:id'], async (req, res) => {
     try {
         const item = await Item.findById(req.params.id)
             .populate('reportedBy', 'name email identifier')
@@ -104,7 +105,7 @@ app.get('/api/items/:id', async (req, res) => {
     }
 });
 
-app.post('/api/items', verifyToken, async (req, res) => {
+app.post(['/api/items', '/items'], verifyToken, async (req, res) => {
     try {
         const newItem = new Item({
             ...req.body,
@@ -117,7 +118,7 @@ app.post('/api/items', verifyToken, async (req, res) => {
     }
 });
 
-app.patch('/api/items/:id/status', verifyToken, async (req, res) => {
+app.patch(['/api/items/:id/status', '/items/:id/status'], verifyToken, async (req, res) => {
     try {
         const { status } = req.body;
         const item = await Item.findByIdAndUpdate(
@@ -131,7 +132,7 @@ app.patch('/api/items/:id/status', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/api/items/:id', verifyToken, async (req, res) => {
+app.delete(['/api/items/:id', '/items/:id'], verifyToken, async (req, res) => {
     try {
         await Item.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: 'Item deleted successfully' });
@@ -140,7 +141,7 @@ app.delete('/api/items/:id', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/users/:userId/reports', async (req, res) => {
+app.get(['/api/users/:userId/reports', '/users/:userId/reports'], async (req, res) => {
     try {
         const items = await Item.find({ reportedBy: req.params.userId }).sort({ createdAt: -1 });
         res.json(items);
@@ -150,7 +151,7 @@ app.get('/api/users/:userId/reports', async (req, res) => {
 });
 
 // Claims Routes
-app.post('/api/claims', verifyToken, async (req, res) => {
+app.post(['/api/claims', '/claims'], verifyToken, async (req, res) => {
     try {
         const newClaim = new Claim({
             ...req.body,
@@ -163,7 +164,7 @@ app.post('/api/claims', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/claims/pending', async (req, res) => {
+app.get(['/api/claims/pending', '/claims/pending'], async (req, res) => {
     try {
         const claims = await Claim.find({ status: 'pending' }).populate('itemId').sort({ createdAt: -1 });
         res.json(claims);
@@ -172,7 +173,7 @@ app.get('/api/claims/pending', async (req, res) => {
     }
 });
 
-app.post('/api/claims/:id/verify', verifyToken, async (req, res) => {
+app.post(['/api/claims/:id/verify', '/claims/:id/verify'], verifyToken, async (req, res) => {
     try {
         const { decision, note } = req.body;
         const claim = await Claim.findById(req.params.id);
@@ -199,7 +200,7 @@ app.post('/api/claims/:id/verify', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/users/:userId/claims', async (req, res) => {
+app.get(['/api/users/:userId/claims', '/users/:userId/claims'], async (req, res) => {
     try {
         const claims = await Claim.find({ claimantId: req.params.userId }).populate('itemId').sort({ createdAt: -1 });
         res.json(claims);
@@ -209,7 +210,7 @@ app.get('/api/users/:userId/claims', async (req, res) => {
 });
 
 // Image Upload Routes (Cloudinary)
-app.post('/api/upload', verifyToken, async (req, res) => {
+app.post(['/api/upload', '/upload'], verifyToken, async (req, res) => {
     try {
         const { imageBase64, folder = 'lost-found' } = req.body;
         if (!imageBase64) return res.status(400).json({ error: 'Image data is required' });
@@ -235,7 +236,7 @@ app.post('/api/upload', verifyToken, async (req, res) => {
 });
 
 // Authentication Routes
-app.post('/api/auth/register', async (req, res) => {
+app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
     try {
         const { email, password, name, role, identifier, ...rest } = req.body;
         
@@ -272,7 +273,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     try {
         const { email, password } = req.body;
         
@@ -291,7 +292,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // User Management Routes
-app.get('/api/users/check/:identifier', async (req, res) => {
+app.get(['/api/users/check/:identifier', '/users/check/:identifier'], async (req, res) => {
     try {
         const { identifier } = req.params;
         const { role } = req.query;
@@ -302,7 +303,7 @@ app.get('/api/users/check/:identifier', async (req, res) => {
     }
 });
 
-app.post('/api/users/sync', verifyToken, async (req, res) => {
+app.post(['/api/users/sync', '/users/sync'], verifyToken, async (req, res) => {
     try {
         const userId = req.user.id;
         const { ...userData } = req.body;
@@ -327,7 +328,7 @@ app.post('/api/users/sync', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/users/lookup', async (req, res) => {
+app.get(['/api/users/lookup', '/users/lookup'], async (req, res) => {
     try {
         const { identifier } = req.query;
         if (!identifier) return res.status(400).json({ error: 'Identifier is required' });
@@ -348,6 +349,7 @@ app.get('/api/users/lookup', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 // Export the app for Vercel
