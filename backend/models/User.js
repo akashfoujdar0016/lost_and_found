@@ -2,17 +2,15 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // Added for local auth
-    uid: { type: String, unique: true, sparse: true }, // Optional: Keep for compatibility during transition
-    displayName: String,
-    name: String,
-    photoURL: String,
-    profilePhotoUrl: String,
-    phoneNumber: String,
-    mobile: String,
-    rollNumber: String,
-    identifier: String,
+    password: { type: String, required: true },
+    name: { type: String, required: true },
     role: { type: String, enum: ['student', 'faculty', 'admin'], default: 'student' },
+    identifier: { type: String, required: true }, // Roll No or Faculty ID
+    universityEmail: String,
+    personalEmail: String,
+    mobile: String,
+    dateOfBirth: String,
+    profilePhotoUrl: String,
     emailVerified: { type: Boolean, default: false },
     mobileVerified: { type: Boolean, default: false },
     documentVerified: { type: Boolean, default: false },

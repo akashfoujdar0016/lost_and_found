@@ -264,7 +264,11 @@ app.post('/api/auth/register', async (req, res) => {
         
         res.status(201).json({ token, user: { id: user._id, email, name, role } });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Registration Error Details:', error);
+        res.status(500).json({ 
+            error: error.message,
+            details: error.errors ? Object.keys(error.errors).map(key => error.errors[key].message) : null
+        });
     }
 });
 
