@@ -2,7 +2,11 @@
 export default {
     content: [
         "./index.html",
+        "index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
+        "src/**/*.{js,ts,jsx,tsx}",
+        "./src/pages/**/*.{js,ts,jsx,tsx}",
+        "./src/components/**/*.{js,ts,jsx,tsx}",
     ],
     darkMode: ['class', '[data-theme="dark"]'],
     theme: {
@@ -21,30 +25,8 @@ export default {
             },
             boxShadow: {
                 'premium': '0 10px 15px -3px rgba(15, 23, 42, 0.08)',
-            },
-            animation: {
-                'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                'fade-in': 'fadeIn 0.5s ease-out forwards',
-                'fadeIn': 'fadeIn 0.5s ease-out forwards',
-                'slide-left': 'slideLeft 0.3s ease-out forwards',
-                'slide-up': 'slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-            },
-            keyframes: {
-                fadeIn: {
-                    from: { opacity: '0' },
-                    to: { opacity: '1' },
-                },
-                slideLeft: {
-                    from: { transform: 'translateX(100%)', opacity: '0' },
-                    to: { transform: 'translateX(0)', opacity: '1' },
-                },
-                slideInUp: {
-                    from: { opacity: '0', transform: 'translateY(30px)' },
-                    to: { opacity: '1', transform: 'translateY(0)' },
-                },
-            },
+            }
         },
     },
     plugins: [],
 }
-

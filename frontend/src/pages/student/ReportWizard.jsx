@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
-import { createItem, uploadItemImages } from '../../services/items.service';
+import { createItem, uploadItemImages } from '../../services/lostfound.service';
 import { useAuth } from '../../context/AuthContext';
 import {
     Info, Camera, MapPin, CheckCircle,
@@ -59,10 +59,10 @@ const ReportWizard = () => {
                     ...formData,
                     images: imageUrls
                 },
-                user
+                user.id
             );
             console.log('Item created successfully:', result);
-            setCreatedItemId(result.itemId);
+            setCreatedItemId(result.id);
 
             setStep(4); // Success Step
         } catch (err) {

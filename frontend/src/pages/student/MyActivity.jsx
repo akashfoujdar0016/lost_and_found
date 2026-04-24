@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
-import { getItems } from '../../services/items.service';
+import { getItems, getMyClaims } from '../../services/lostfound.service';
 import { useAuth } from '../../context/AuthContext';
 import { FileText, MessageSquare, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -18,21 +18,22 @@ const MyActivity = () => {
             try {
                 // Fetch user's reports
                 const allItems = await getItems();
-                const userReports = allItems.filter(item => item.reportedBy?.uid === user?.uid);
+                const userReports = allItems.filter(item => item.reportedBy === user?.id);
                 setReports(userReports);
 
-                // Claims feature not implemented yet
-                setClaims([]);
+                // Fetch user's claims
+                const userClaims = await getMyClaims(user?.id);
+                setClaims(userClaims);
             } catch (err) {
                 console.error('Activity error:', err);
             } finally {
                 setIsLoading(false);
             }
         };
-        if (user?.uid) {
+        if (user?.id) {
             loadData();
         }
-    }, [user?.uid]);
+    }, [user?.id]);
 
     return (
         <Layout>
@@ -80,7 +81,7 @@ const MyActivity = () => {
                                                 <h4 className="font-extrabold text-sm uppercase tracking-tight">{report.title}</h4>
                                             </div>
                                             <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase">
-                                                {report.location} • {report.createdAt?.toDate ? new Date(report.createdAt.toDate()).toLocaleDateString() : 'Recently'}
+                                                {report.location} • {report.createdAt?.toDate ? new Date(report.createdAt.toDate()).toLocaleDateString() : (report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Recently')}
                                             </p>
                                         </div>
                                     </div>

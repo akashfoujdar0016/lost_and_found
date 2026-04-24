@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Calendar, CreditCard, Building, ArrowLeft, Edit2, Save, X, Camera, Trash2, FileText, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserProfile, updateUserProfile, uploadUserDocuments } from '../../services/user.service';
-import { getMyReports, getMyClaims } from '../../services/firestore.service';
+import { getMyReports, getMyClaims } from '../../services/lostfound.service';
 import DocumentUpload from '../../components/auth/DocumentUpload';
 
 const UserProfile = () => {
@@ -28,9 +28,9 @@ const UserProfile = () => {
             setLoading(true);
             if (user) {
                 const [data, reports, claims] = await Promise.all([
-                    getUserProfile(user.uid),
-                    getMyReports(user.uid),
-                    getMyClaims(user.uid)
+                    getUserProfile(user.id),
+                    getMyReports(user.id),
+                    getMyClaims(user.id)
                 ]);
                 setProfile(data);
                 setEditData(data || {});
@@ -80,11 +80,11 @@ const UserProfile = () => {
             // Upload photo if changed
             if (editData.newPhoto) {
                 console.log('Uploading new photo to Cloudinary...');
-                const result = await uploadUserDocuments(user.uid, null, editData.newPhoto);
+                const result = await uploadUserDocuments(user.id, null, editData.newPhoto);
                 console.log('Upload successful:', result);
             } else if (editData.removePhoto) {
                 console.log('Removing profile photo from Firestore...');
-                await updateUserProfile(user.uid, {
+                await updateUserProfile(user.id, {
                     profilePhotoUrl: null,
                     profilePhotoPublicId: null
                 });

@@ -1,4 +1,4 @@
-import { getItems } from './items.service';
+import { getItems } from './lostfound.service';
 
 /**
  * Smart Item Matching Service

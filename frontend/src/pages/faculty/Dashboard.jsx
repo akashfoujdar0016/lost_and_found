@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
-import { getItems } from '../../services/items.service';
-import { getPendingClaims } from '../../services/firestore.service';
+import { getItems, getPendingClaims } from '../../services/lostfound.service';
 import { getMatchRecommendations } from '../../services/matching.service';
 import MatchCard from '../../components/faculty/MatchCard';
 import {
@@ -84,13 +83,13 @@ const FacultyDashboard = () => {
                 const labels = last7Days.map(d => d.toLocaleDateString('en-US', { weekday: 'short' }));
                 const lostData = last7Days.map(date => {
                     return lostItems.filter(item => {
-                        const itemDate = item.createdAt?.toDate?.() || new Date(0);
+                        const itemDate = item.createdAt?.toDate ? item.createdAt.toDate() : new Date(item.createdAt || 0);
                         return itemDate.toDateString() === date.toDateString();
                     }).length;
                 });
                 const foundData = last7Days.map(date => {
                     return foundItems.filter(item => {
-                        const itemDate = item.createdAt?.toDate?.() || new Date(0);
+                        const itemDate = item.createdAt?.toDate ? item.createdAt.toDate() : new Date(item.createdAt || 0);
                         return itemDate.toDateString() === date.toDateString();
                     }).length;
                 });
@@ -150,7 +149,7 @@ const FacultyDashboard = () => {
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                 const oldActive = items.filter(item => {
-                    const itemDate = item.createdAt?.toDate?.() || new Date();
+                    const itemDate = item.createdAt?.toDate ? item.createdAt.toDate() : new Date(item.createdAt || Date.now());
                     return item.status === 'active' && itemDate < sevenDaysAgo;
                 });
 
@@ -158,7 +157,7 @@ const FacultyDashboard = () => {
                 const oneDayAgo = new Date();
                 oneDayAgo.setDate(oneDayAgo.getDate() - 1);
                 const urgent = claims.filter(claim => {
-                    const claimDate = claim.createdAt?.toDate?.() || new Date();
+                    const claimDate = claim.createdAt?.toDate ? claim.createdAt.toDate() : new Date(claim.createdAt || Date.now());
                     return claimDate < oneDayAgo;
                 });
 
@@ -333,7 +332,7 @@ const FacultyDashboard = () => {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-sm truncate">{item.title}</p>
                                                 <p className="text-xs text-slate-500">
-                                                    Active for {Math.floor((new Date() - (item.createdAt?.toDate?.() || new Date())) / (1000 * 60 * 60 * 24))} days
+                                                    Active for {Math.floor((new Date() - (item.createdAt?.toDate ? item.createdAt.toDate() : new Date(item.createdAt || Date.now()))) / (1000 * 60 * 60 * 24))} days
                                                 </p>
                                             </div>
                                             <span className="text-xs font-bold text-amber-600 flex-shrink-0">
@@ -351,7 +350,7 @@ const FacultyDashboard = () => {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-sm">Pending claim verification</p>
                                                 <p className="text-xs text-slate-500">
-                                                    Waiting for {Math.floor((new Date() - (claim.createdAt?.toDate?.() || new Date())) / (1000 * 60 * 60))} hours
+                                                    Waiting for {Math.floor((new Date() - (claim.createdAt?.toDate ? claim.createdAt.toDate() : new Date(claim.createdAt || Date.now()))) / (1000 * 60 * 60))} hours
                                                 </p>
                                             </div>
                                             <span className="text-xs font-bold text-purple-600 flex-shrink-0">

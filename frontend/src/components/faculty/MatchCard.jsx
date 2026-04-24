@@ -246,7 +246,7 @@ const MatchCard = ({ match }) => {
                         <p>• Category: {lostItem.category === foundItem.category ? '✓ Match' : '− Different'}</p>
                         <p>• Color: {lostItem.color?.toLowerCase() === foundItem.color?.toLowerCase() ? '✓ Match' : '− Different'}</p>
                         <p>• Location: {lostItem.location && foundItem.location && lostItem.location.toLowerCase().includes(foundItem.location.toLowerCase().split(' ')[0]) ? '✓ Similar' : '− Different'}</p>
-                        <p>• Timing: Within {Math.ceil(Math.abs((lostItem.createdAt?.toDate?.() || new Date()) - (foundItem.createdAt?.toDate?.() || new Date())) / (1000 * 60 * 60 * 24))} days</p>
+                        <p>• Timing: Within {Math.ceil(Math.abs((lostItem.createdAt?.toDate ? lostItem.createdAt.toDate() : new Date(lostItem.createdAt || Date.now())) - (foundItem.createdAt?.toDate ? foundItem.createdAt.toDate() : new Date(foundItem.createdAt || Date.now()))) / (1000 * 60 * 60 * 24))} days</p>
                     </div>
                 </details>
             </div>

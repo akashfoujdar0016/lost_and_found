@@ -57,7 +57,6 @@ Visit `http://localhost:5173`
 - 📋 Faculty Verification Dashboard
 - 📝 Lost/Found Item Reporting
 - 🔍 Item Search & Browse
-- 🚀 **Zero-Config Mock Backend:** Automatically intercepts and mocks all Firebase/Cloudinary calls into `localStorage` if `.env` keys are missing. This allows for instant deployment to Vercel/GitHub Pages with zero configuration for testing purposes!
 
 ### 🚧 In Progress
 - Real-time Notifications

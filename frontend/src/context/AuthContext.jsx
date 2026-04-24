@@ -1,46 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { getUserProfile } from '../services/user.service';
+import { logoutUser, onAuthChange } from '../services/auth.service';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(false); // Background loading state
-    const [initialLoading, setInitialLoading] = useState(true); // App-blocking initial check
+    const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(true);
 
     useEffect(() => {
-        // Listen to Firebase auth state changes
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            setLoading(true);
-            if (firebaseUser) {
-                try {
-                    // Fetch user profile from Firestore
-                    const profile = await getUserProfile(firebaseUser.uid);
-                    if (profile) {
-                        setUser({
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email,
-                            ...profile
-                        });
-                    } else {
-                        // User exists in Firebase Auth but not in Firestore (edge case)
-                        console.warn('User profile not found in Firestore');
-                        setUser({
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email,
-                            role: 'student' // Default fallback
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error fetching user profile:', error);
-                    setUser(null);
-                }
-            } else {
-                setUser(null);
-            }
-            setLoading(false);
+        // Initial auth check from localStorage
+        const unsubscribe = onAuthChange((userData) => {
+            setUser(userData);
             setInitialLoading(false);
         });
 
@@ -49,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await signOut(auth);
+            await logoutUser();
             setUser(null);
         } catch (error) {
             console.error('Logout error:', error);
@@ -57,25 +28,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     const refreshUser = async () => {
-        if (auth.currentUser) {
-            setLoading(true);
-            try {
-                const profile = await getUserProfile(auth.currentUser.uid);
-                if (profile) {
-                    setUser({
-                        uid: auth.currentUser.uid,
-                        email: auth.currentUser.email,
-                        ...profile
-                    });
-                }
-            } catch (error) {
-                console.error('Error refreshing user profile:', error);
-            }
-            setLoading(false);
+        // For JWT, we just re-read from localStorage or we could fetch from API
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            setUser(JSON.parse(userData));
         }
     };
 
-    // ONLY block the entire app during the very first auth check
     if (initialLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden">

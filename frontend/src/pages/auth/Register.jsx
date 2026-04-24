@@ -1,17 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, Mail, Smartphone } from 'lucide-react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config/firebase';
-import {
-    createUserProfile,
-    checkIdentifierExists,
-    generateSystemPassword,
-    sendOTP,
-    verifyOTP
-} from '../../services/user.service';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { registerUser } from '../../services/auth.service';
 import { useAuth } from '../../context/AuthContext';
-import OTPInput from '../../components/auth/OTPInput';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -26,13 +17,13 @@ const Register = () => {
         name: '',
         dateOfBirth: '',
         universityEmail: '', // Primary email for auth
-        personalEmail: '', // Added as requested
+        personalEmail: '', 
         mobile: '',
         identifier: '',
-        otpSession: null
+        password: '' // Added password field
     });
 
-    const totalSteps = 5;
+    const totalSteps = 4; // Role, Personal, University, Done
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -44,40 +35,6 @@ const Register = () => {
         setFormData(prev => ({ ...prev, role }));
         setCurrentStep(2);
     };
-
-    // Auto-send OTP when reaching step 4
-    const [otpTriggered, setOtpTriggered] = useState(false);
-
-    useEffect(() => {
-        const triggerOTP = async () => {
-            if (currentStep === 4 && !otpTriggered) {
-                try {
-                    setLoading(true);
-                    setOtpTriggered(true);
-
-                    // Send Unified OTP to BOTH channels (Email & Mobile)
-                    // The same code is now sent to both for consistency
-                    const result = await sendOTP(
-                        formData.name,
-                        ['email', 'mobile'],
-                        { email: formData.personalEmail, mobile: formData.mobile },
-                        formData.name
-                    );
-
-                    setFormData(prev => ({ ...prev, otpSession: result.sessionId }));
-                } catch (error) {
-                    setError('Failed to send OTP: ' + error.message);
-                    setOtpTriggered(false); // Allow retry
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-        triggerOTP();
-    }, [currentStep, otpTriggered]);
-
-    // NO AUTO-REDIRECT: User must click "Get Started" manually as requested
-    // (Removed useEffect timer)
 
     const validateBasicInfo = () => {
         if (!formData.name || !formData.dateOfBirth || !formData.mobile || !formData.personalEmail) {
@@ -109,11 +66,11 @@ const Register = () => {
             return false;
         }
 
-        const exists = await checkIdentifierExists(formData.identifier, formData.role);
-        if (exists) {
-            setError('This identifier is already registered');
+        if (!formData.password || formData.password.length < 6) {
+            setError('Password must be at least 6 characters');
             return false;
         }
+
         return true;
     };
 
@@ -132,7 +89,12 @@ const Register = () => {
                 return;
             }
 
-            setCurrentStep(prev => prev + 1);
+            if (currentStep === 3) {
+                // If it's the last step before completion, trigger registration
+                await handleRegistrationComplete();
+            } else {
+                setCurrentStep(prev => prev + 1);
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -145,106 +107,63 @@ const Register = () => {
         setError('');
     };
 
-    const handleResendOTP = async () => {
-        try {
-            setLoading(true);
-            setError('');
-            // Trigger same logic again
-            const result = await sendOTP(
-                formData.name,
-                ['email', 'mobile'],
-                { email: formData.personalEmail, mobile: formData.mobile },
-                formData.name
-            );
-            setFormData(prev => ({ ...prev, otpSession: result.sessionId }));
-            alert('A new OTP has been sent to your email and mobile.');
-        } catch (err) {
-            setError('Failed to resend OTP: ' + err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleOTPComplete = async (otp) => {
-        try {
-            setLoading(true);
-            // Verify OTP using Firestore-based system
-            await verifyOTP(formData.otpSession, otp);
-            await handleRegistrationComplete();
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleRegistrationComplete = async () => {
         try {
             setLoading(true);
             setError('');
 
-            const systemPassword = generateSystemPassword(formData.identifier);
-
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
+            const result = await registerUser(
                 formData.personalEmail.trim(),
-                systemPassword
+                formData.password,
+                {
+                    role: formData.role,
+                    name: formData.name,
+                    dateOfBirth: formData.dateOfBirth,
+                    universityEmail: formData.universityEmail.trim(),
+                    personalEmail: formData.personalEmail.trim(),
+                    mobile: formData.mobile,
+                    identifier: formData.identifier.trim(),
+                    emailVerified: true,
+                    mobileVerified: true
+                }
             );
-            const userId = userCredential.user.uid;
 
-            await createUserProfile(userId, {
-                role: formData.role,
-                name: formData.name,
-                dateOfBirth: formData.dateOfBirth,
-                email: formData.personalEmail.trim(),
-                universityEmail: formData.universityEmail.trim(),
-                personalEmail: formData.personalEmail.trim(),
-                mobile: formData.mobile,
-                identifier: formData.identifier.trim(),
-                emailVerified: true,
-                mobileVerified: true
-            });
-
-            // Refresh user context to include the new profile
-            await refreshUser();
-
-            // Finally show success screen
-            setLoading(false);
-            setCurrentStep(5);
+            if (result.success) {
+                // Refresh user context to include the new profile
+                await refreshUser();
+                
+                // Finally show success screen
+                setLoading(false);
+                setCurrentStep(4);
+            }
         } catch (err) {
             setLoading(false);
-            if (err.code === 'auth/email-already-in-use') {
-                setError('This email is already registered. Please Login instead.');
-            } else {
-                setError(err.message || 'Registration failed at final step');
-            }
-            // RE-THROW to be caught by handleOTPComplete
-            throw err;
+            setError(err.message || 'Registration failed at final step');
         }
     };
 
     const renderStepIndicator = () => {
-        const stepLabels = ['Role', 'Personal', 'University', 'Verify', 'Done'];
-        const indicatorSteps = [1, 2, 3, 4, 5];
+        const stepLabels = ['Role', 'Personal', 'University', 'Done'];
+        const indicatorSteps = [1, 2, 3, 4];
         return (
             <div className="flex items-center justify-between mb-12 px-2">
                 {indicatorSteps.map((step, idx) => (
                     <React.Fragment key={step}>
                         <div className="flex flex-col items-center relative gap-2">
-                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm md:text-base border-2 transition-all duration-500 z-10 ${step < currentStep || (currentStep === 5 && step === 5)
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm md:text-base border-2 transition-all duration-500 z-10 ${step < currentStep || (currentStep === 4 && step === 4)
                                 ? 'bg-green-500 border-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
                                 : step === currentStep
                                     ? 'bg-cyan-400 border-cyan-400 text-gray-900 shadow-[0_0_15px_rgba(34,211,238,0.4)]'
                                     : 'bg-white/5 border-white/10 text-white/40'
                                 }`}>
-                                {step < currentStep || (currentStep === 5 && step === 5) ? <Check size={20} /> : step}
+                                {step < currentStep || (currentStep === 4 && step === 4) ? <Check size={20} /> : step}
                             </div>
                             <span className={`absolute -bottom-7 text-[10px] md:text-xs font-semibold whitespace-nowrap transition-colors duration-300 ${(step <= currentStep) ? 'text-white' : 'text-white/30'
                                 }`}>
                                 {stepLabels[idx]}
                             </span>
                         </div>
-                        {step < 5 && (
+                        {step < 4 && (
                             <div className="flex-1 h-0.5 mx-2 relative overflow-hidden bg-white/10 min-w-[20px]">
                                 <div
                                     className="absolute inset-x-0 h-full bg-gradient-to-r from-green-500 to-cyan-400 transition-all duration-700 ease-in-out"
@@ -350,10 +269,10 @@ const Register = () => {
                             </div>
                         )}
 
-                        {/* Step 3: University Credentials */}
+                        {/* Step 3: University Credentials & Security */}
                         {currentStep === 3 && (
                             <div className="space-y-5">
-                                <h2 className="text-2xl font-bold mb-6 text-white">University Credentials</h2>
+                                <h2 className="text-2xl font-bold mb-6 text-white">Credentials & Security</h2>
 
                                 <div>
                                     <label className="block text-sm font-medium text-white/80 mb-2">
@@ -365,34 +284,18 @@ const Register = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-white/80 mb-2">University Email</label>
                                     <input type="email" name="universityEmail" value={formData.universityEmail} onChange={handleInputChange} placeholder={formData.role === 'student' ? 'student@gla.ac.in' : 'faculty@gla.ac.in'} className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/20 transition-all text-white" />
-                                    <p className="text-xs text-white/40 mt-2">Use your official university email address</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-white/80 mb-2">Create Password</label>
+                                    <input type="password" name="password" value={formData.password} onChange={handleInputChange} placeholder="••••••••" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/20 transition-all text-white" />
+                                    <p className="text-[10px] text-white/40 mt-1">Minimum 6 characters</p>
                                 </div>
                             </div>
                         )}
 
-                        {/* Step 4: OTP Verification */}
+                        {/* Step 4: Welcome & Success */}
                         {currentStep === 4 && (
-                            <div className="space-y-6 text-center">
-                                <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                                    <Mail size={32} className="text-cyan-300" />
-                                </div>
-                                <h2 className="text-2xl font-bold text-white">Verify Your Contact</h2>
-                                <p className="text-white/60">
-                                    We've sent a 6-digit code to<br />
-                                    <span className="text-cyan-300 font-semibold">{formData.personalEmail}</span> &<br />
-                                    <span className="text-green-300 font-semibold">+91 {formData.mobile}</span>
-                                </p>
-
-                                <OTPInput
-                                    length={6}
-                                    onComplete={handleOTPComplete}
-                                    onResend={handleResendOTP}
-                                />
-                            </div>
-                        )}
-
-                        {/* Step 5: Welcome & Success */}
-                        {currentStep === 5 && (
                             <div className="text-center space-y-8 py-4 animate-fade-in">
                                 <div className="relative flex items-center justify-center mb-8">
                                     <div className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center animate-bounce">
@@ -459,7 +362,7 @@ const Register = () => {
                                 disabled={loading}
                                 className="flex-1 px-6 py-3 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition-all disabled:opacity-50"
                             >
-                                {loading ? 'Processing...' : 'Next'}
+                                {loading ? 'Processing...' : currentStep === 3 ? 'Complete Registration' : 'Next'}
                                 <ArrowRight className="inline ml-2" size={20} />
                             </button>
                         </div>

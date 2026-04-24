@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
-import { getPendingClaims, verifyClaim } from '../../services/firestore.service';
-import { getItemById } from '../../services/items.service';
+import { getPendingClaims, verifyClaim, getItemById } from '../../services/lostfound.service';
 import { getUserProfile } from '../../services/user.service';
 import {
     Check, X, MessageSquare, AlertCircle,

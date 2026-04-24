@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Layout } from '../../components/layout/Layout';
-import { getItems } from '../../services/items.service';
+import { getItems } from '../../services/lostfound.service';
 import { Search, Filter, X, ChevronDown, MessageSquare, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -158,7 +158,7 @@ const ItemSearch = () => {
                                                 {item.status}
                                             </span>
                                             <span className="text-[10px] font-bold text-slate-400">
-                                                {item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Recently'}
+                                                {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recently'}
                                             </span>
                                         </div>
                                     </div>

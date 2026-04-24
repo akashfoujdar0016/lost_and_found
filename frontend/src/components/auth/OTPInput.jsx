@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const OTPInput = ({ length = 6, onComplete, onResend, countdown = 60, isLoading = false }) => {
+const OTPInput = ({ length = 6, onComplete, onResend, countdown = 60 }) => {
     const [otp, setOtp] = useState(new Array(length).fill(''));
     const [timeLeft, setTimeLeft] = useState(countdown);
     const inputRefs = useRef([]);
@@ -86,17 +86,14 @@ const OTPInput = ({ length = 6, onComplete, onResend, countdown = 60, isLoading 
                         onChange={(e) => handleChange(e.target, index)}
                         onKeyDown={(e) => handleKeyDown(e, index)}
                         onPaste={handlePaste}
-                        disabled={isLoading}
-                        className={`w-12 h-14 text-center text-2xl font-bold rounded-xl bg-white/5 border-2 border-white/10 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/20 transition-all text-white ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-white/5 border-2 border-white/10 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/20 transition-all"
                         autoFocus={index === 0}
                     />
                 ))}
             </div>
 
             <div className="text-center">
-                {isLoading ? (
-                    <p className="text-sm text-white/60">Verifying<span className="animate-pulse">...</span></p>
-                ) : timeLeft > 0 ? (
+                {timeLeft > 0 ? (
                     <p className="text-sm text-white/60">
                         Resend OTP in <span className="text-cyan-300 font-semibold">{timeLeft}s</span>
                     </p>

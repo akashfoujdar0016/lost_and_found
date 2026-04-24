@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
-import { getItems, updateItemStatus } from '../../services/items.service';
+import { getItems, updateItemStatus } from '../../services/lostfound.service';
 import { getUserProfile } from '../../services/user.service';
 import ContactModal from '../../components/faculty/ContactModal';
 import {

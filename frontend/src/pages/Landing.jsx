@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getItems } from '../services/items.service';
+import { getItems } from '../services/lostfound.service';
 
 const getEmojiForCategory = (category) => {
     const emojiMap = {
@@ -388,7 +388,7 @@ const Landing = () => {
                                 <span className="text-cyan-300">1</span>
                             </div>
                             <h4 className="text-xl font-bold text-white mb-3">Register</h4>
-                            <p className="text-white/60 leading-relaxed">Sign up with your university ID and verify your identity via OTP.</p>
+                            <p className="text-white/60 leading-relaxed">Sign up with your university ID and create a secure password.</p>
                         </div>
 
                         {/* Step 2 */}
@@ -504,7 +504,7 @@ const Landing = () => {
                         {/* Copyright Bar */}
                         <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/50">
                             <p>© 2024 GLA University Lost & Found. All rights reserved.</p>
-                            <p>Made with React, Firebase & Tailwind CSS</p>
+                            <p>Made with React, MongoDB & Node.js</p>
                         </div>
                     </div>
                 </div>

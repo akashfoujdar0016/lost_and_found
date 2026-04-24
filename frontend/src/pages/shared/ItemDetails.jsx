@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
-import { getItemById, deleteItem } from '../../services/items.service';
-import { createClaim } from '../../services/firestore.service';
+import { getItemById, deleteItem, createClaim } from '../../services/lostfound.service';
 import { useAuth } from '../../context/AuthContext';
 import {
     Calendar, MapPin, Tag, User,
@@ -53,7 +52,7 @@ const ItemDetails = () => {
         setIsClaiming(true);
         try {
             await createClaim(id, {
-                claimantId: user.uid,
+                claimantId: user.id,
                 message: claimMessage,
                 trustScore: 75
             });
@@ -118,7 +117,7 @@ const ItemDetails = () => {
                         <div className="grid grid-cols-2 gap-8">
                             {[
                                 { icon: <MapPin className="text-blue-600" />, label: 'Location', value: item.location },
-                                { icon: <Calendar className="text-amber-500" />, label: 'Reported Date', value: item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pending' },
+                                { icon: <Calendar className="text-amber-500" />, label: 'Reported Date', value: item.createdAt?.toDate ? new Date(item.createdAt.toDate()).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : (item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pending') },
                                 { icon: <Tag className="text-emerald-500" />, label: 'Category', value: item.category },
                                 { icon: <User className="text-indigo-500" />, label: 'Color Detail', value: item.color }
                             ].map((detail, idx) => (
@@ -169,7 +168,7 @@ const ItemDetails = () => {
                             )}
 
                             {/* Owner Actions */}
-                            {user.uid === item.reportedBy?.uid && (
+                            {user.id === item.reportedBy && (
                                 <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                                     <button
                                         onClick={handleDelete}

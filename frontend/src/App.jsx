@@ -28,7 +28,7 @@ function App() {
                 <Route path="/" element={<Landing />} />
                 <Route
                     path="/login"
-                    element={isAuthenticated ? <Navigate to={`/${user?.role}/dashboard`} replace /> : <Login />}
+                    element={isAuthenticated ? <Navigate to={`/${user.role}/dashboard`} replace /> : <Login />}
                 />
                 <Route path="/register" element={<Register />} />
 
