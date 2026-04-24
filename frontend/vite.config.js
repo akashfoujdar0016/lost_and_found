@@ -5,6 +5,14 @@ import react from '@vitejs/plugin-react'
 console.log('--- VITE CONFIG LOADING ---');
 export default defineConfig({
     plugins: [react()],
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+            },
+        },
+    },
     build: {
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
