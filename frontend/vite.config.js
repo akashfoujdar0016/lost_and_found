@@ -19,9 +19,6 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
-                        if (id.includes('firebase')) {
-                            return 'firebase';
-                        }
                         if (id.includes('react')) {
                             return 'react-vendor';
                         }
