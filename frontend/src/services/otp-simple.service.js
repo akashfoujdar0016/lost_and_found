@@ -25,15 +25,6 @@ export const sendOTPSimple = async (contact, type) => {
             verified: false
         });
 
-        // Log to console
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`${type === 'email' ? '📧 EMAIL' : '📱 MOBILE'} OTP`);
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`To: ${contact}`);
-        console.log(`OTP: ${otp}`);
-        console.log(`Session: ${sessionId}`);
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-
         return {
             success: true,
             sessionId,

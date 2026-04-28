@@ -52,14 +52,6 @@ const StudentDashboard = () => {
                 setMyReports(userReports);
                 setRecentItems(othersItems);
 
-                console.log('DEBUG DASHBOARD:', {
-                    currentUser: user?.id,
-                    firstItemReporter: allItems[0]?.reportedBy,
-                    isMatch: allItems[0]?.reportedBy === user?.id,
-                    allItemsCount: allItems.length,
-                    userReportsCount: userReports.length
-                });
-
                 // Check for matches
                 const recommendations = await getMatchRecommendations(2);
                 setMatches(recommendations);

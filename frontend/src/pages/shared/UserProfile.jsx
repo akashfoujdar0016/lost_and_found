@@ -75,31 +75,24 @@ const UserProfile = () => {
         try {
             setSaving(true);
             setError('');
-            console.log('Starting photo save...', { hasNewPhoto: !!editData.newPhoto, shouldRemove: !!editData.removePhoto });
 
             // Upload photo if changed
             if (editData.newPhoto) {
-                console.log('Uploading new photo to Cloudinary...');
-                const result = await uploadUserDocuments(user.id, null, editData.newPhoto);
-                console.log('Upload successful:', result);
+                await uploadUserDocuments(user.id, null, editData.newPhoto);
             } else if (editData.removePhoto) {
-                console.log('Removing profile photo from Firestore...');
+                // Remove profile photo from database
                 await updateUserProfile(user.id, {
                     profilePhotoUrl: null,
                     profilePhotoPublicId: null
                 });
-                console.log('Photo removed successfully');
             }
 
             // Refresh profile on this page
-            console.log('Refreshing profile data...');
             await loadProfile();
             // Refresh user context to update sidebar avatar
-            console.log('Refreshing auth context...');
             await refreshUser();
             setLocalPreview(null);
             setEditData({});
-            console.log('Profile update complete!');
         } catch (err) {
             console.error('Profile update error:', err);
             setError('Failed to update profile: ' + (err.message || 'Unknown error'));

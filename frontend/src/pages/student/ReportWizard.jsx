@@ -42,18 +42,13 @@ const ReportWizard = () => {
         setIsSubmitting(true);
         setError('');
         try {
-            console.log('Starting report submission...');
-
             // Upload images to Cloudinary first
             let imageUrls = [];
             if (formData.imageFiles.length > 0) {
-                console.log('Uploading images to Cloudinary...');
                 imageUrls = await uploadItemImages(formData.imageFiles);
-                console.log('Images uploaded:', imageUrls);
             }
 
-            // Create item in Firestore
-            console.log('Creating item in Firestore...');
+            // Create item in database
             const result = await createItem(
                 {
                     ...formData,
@@ -61,7 +56,6 @@ const ReportWizard = () => {
                 },
                 user.id
             );
-            console.log('Item created successfully:', result);
             setCreatedItemId(result.id);
 
             setStep(4); // Success Step

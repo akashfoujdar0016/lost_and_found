@@ -65,7 +65,6 @@ export const uploadUserDocuments = async (userId, files) => {
         if (!files || files.length === 0) return [];
         // For now, reuse the item image upload logic structure if needed, 
         // but here we just return a success message or mock URLs
-        console.log('Uploading documents for user:', userId);
         return ['doc_uploaded_success'];
     } catch (error) {
         console.error('Error uploading documents:', error);
