@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
-import { createItem, uploadItemImages } from '../../services/lostfound.service';
+import { createItem } from '../../services/lostfound.service';
+import { uploadMultipleImagesDirect } from '../../services/cloudinary.service';
 import { useAuth } from '../../context/AuthContext';
 import {
     Info, Camera, MapPin, CheckCircle,
@@ -45,7 +46,8 @@ const ReportWizard = () => {
             // Upload images to Cloudinary first
             let imageUrls = [];
             if (formData.imageFiles.length > 0) {
-                imageUrls = await uploadItemImages(formData.imageFiles);
+                const uploadResults = await uploadMultipleImagesDirect(formData.imageFiles);
+                imageUrls = uploadResults.map(res => res.url);
             }
 
             // Create item in database
