@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginWithEmail } from '../../services/auth.service';
+import { useAuth } from '../../context/AuthContext';
 import { AlertCircle, ArrowLeft, GraduationCap, Building2, Lock, Mail } from 'lucide-react';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [activeTab, setActiveTab] = useState('student'); // 'student' or 'faculty'
 
     // Form States
@@ -31,6 +33,7 @@ const Login = () => {
             const result = await loginWithEmail(email.trim(), password);
             
             if (result.success) {
+                await refreshUser(); // Update the AuthContext with the new user session
                 // Check if the user's role matches the selected tab
                 if (result.user.role !== activeTab) {
                     throw new Error(`Unauthorized access. This account is registered as a ${result.user.role}.`);
