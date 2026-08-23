@@ -197,9 +197,6 @@ npm install firebase
 npm run dev -- --port 3000
 ```
 
-## 📝 License
-
-MIT License - See [LICENSE](./LICENSE) file for details
 
 ## 👥 Contributors
 
