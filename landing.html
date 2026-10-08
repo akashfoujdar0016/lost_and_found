@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA Lost & Found - Bespoke Agency Experience</title>
+    <title>GLA Lost & Found - Bespoke Campus Intelligence</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +23,13 @@
             --font-family: 'Inter', -apple-system, sans-serif;
         }
 
-        html, body {
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
             width: 100%;
-            height: 100%;
+            min-height: 100vh;
             background-color: var(--bg-charcoal);
             color: var(--text-white);
             font-family: var(--font-family);
@@ -49,13 +53,13 @@
         /* Deep Ambient Glow */
         .ambient-glow {
             position: fixed;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(900px, 100vw);
-            height: min(900px, 100vw);
-            background: radial-gradient(circle, rgba(10, 17, 40, 0.7) 0%, transparent 70%);
-            filter: blur(180px);
+            width: min(950px, 100vw);
+            height: min(950px, 100vw);
+            background: radial-gradient(circle, rgba(10, 17, 40, 0.75) 0%, transparent 70%);
+            filter: blur(200px);
             pointer-events: none;
             z-index: 0;
         }
@@ -67,7 +71,7 @@
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 30px 60px -15px rgba(0, 0, 0, 0.8);
-            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
         }
 
         /* Drifting Physics Keyframes */
@@ -94,19 +98,18 @@
         .app-container {
             position: relative;
             z-index: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 120px;
         }
 
-        /* Top Minimal Floating Navbar */
+        /* Top Floating Navbar */
         .nav-wrapper {
             position: fixed;
-            top: 24px;
+            top: 20px;
             left: 0;
             right: 0;
             z-index: 50;
@@ -121,8 +124,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 40px;
-            max-width: 640px;
+            gap: 32px;
+            max-width: 860px;
             width: 100%;
         }
 
@@ -139,33 +142,56 @@
         }
 
         .logo-dot {
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             background-color: var(--accent-cyan);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-cyan);
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
         }
 
         .btn-access {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-white);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 8px 20px;
+            background: var(--accent-cyan);
+            color: #050505;
+            border: none;
+            padding: 10px 24px;
             border-radius: 100px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
             text-decoration: none;
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.3);
             transition: all 0.3s ease;
         }
 
         .btn-access:hover {
-            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.04);
+            box-shadow: 0 12px 30px rgba(0, 229, 255, 0.5);
         }
 
         /* Hero Section */
         .hero {
-            padding: 180px 0 100px 0;
-            max-width: 900px;
+            padding-top: 180px;
+            max-width: 960px;
         }
 
         .badge {
@@ -179,31 +205,30 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .headline {
-            font-size: clamp(3rem, 8vw, 7rem);
+            font-size: clamp(3rem, 7.5vw, 6.5rem);
             font-weight: 900;
             letter-spacing: -0.05em;
-            line-height: 0.98;
-            margin-bottom: 28px;
+            line-height: 1.02;
+            margin-bottom: 24px;
         }
 
         .headline .cyan-accent {
             color: var(--accent-cyan);
-            text-shadow: 0 0 40px rgba(0, 229, 255, 0.35);
+            text-shadow: 0 0 45px rgba(0, 229, 255, 0.4);
         }
 
         .subtext {
-            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            font-size: clamp(1.125rem, 2.2vw, 1.5rem);
             color: var(--text-muted);
             line-height: 1.5;
-            max-width: 640px;
-            margin-bottom: 44px;
+            max-width: 720px;
+            margin-bottom: 40px;
         }
 
-        /* Magnetic Buttons */
         .hero-actions {
             display: flex;
             align-items: center;
@@ -223,14 +248,13 @@
             border: none;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
+            transition: all 0.4s ease;
         }
 
         .btn-magnetic-primary:hover {
             transform: scale(1.04) translateY(-2px);
             box-shadow: 0 20px 50px rgba(0, 229, 255, 0.5);
-            background: #26ecff;
         }
 
         .btn-magnetic-secondary {
@@ -242,40 +266,130 @@
             border-radius: 100px;
             color: var(--text-white);
             text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: all 0.4s ease;
         }
 
-        .btn-magnetic-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Telemetry Cards */
-        .telemetry-grid {
+        /* Metrics Bar */
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 24px;
-            margin-bottom: 80px;
         }
 
-        .telemetry-card {
+        .metric-card {
+            border-radius: 24px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-num {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--accent-cyan);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        /* Section Headings */
+        .section-header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .section-tag {
+            font-size: 12px;
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-cyan);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.25rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+        }
+
+        /* How it works */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+        }
+
+        .step-card {
+            border-radius: 28px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: var(--accent-cyan);
+            font-weight: 800;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Categories Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .category-card {
             border-radius: 28px;
             padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
+        .category-icon {
+            font-size: 36px;
+            width: fit-content;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Footer */
         .footer {
-            padding: 40px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 40px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
+            align-items: center;
             color: var(--text-muted);
             font-size: 12px;
             font-family: monospace;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         @media (max-width: 768px) {
-            .telemetry-grid {
-                grid-template-columns: 1fr;
-            }
+            .nav-links { display: none; }
+            .app-container { padding: 0 20px; gap: 80px; }
         }
     </style>
 </head>
@@ -294,48 +408,129 @@
                 <span class="logo-dot"></span>
                 <span>GLA NETWORK</span>
             </a>
-            <a href="#login" class="btn-access">Student Access</a>
+            <div class="nav-links">
+                <a href="#how-it-works">How It Works</a>
+                <a href="#metrics">Telemetry</a>
+                <a href="#categories">Categories</a>
+                <a href="#trust">Security</a>
+            </div>
+            <a href="/login" class="btn-access">Student Sign In</a>
         </nav>
     </div>
 
     <!-- Main App Container -->
     <div class="app-container">
+        <!-- Hero Section -->
         <main class="hero">
             <div class="badge true-glass drift-6">
-                <span style="color: var(--accent-cyan);">&bull;</span> Official Campus Recovery Network
+                <span style="color: var(--accent-cyan);">&bull;</span> Official GLA Campus Recovery Platform
             </div>
 
             <h1 class="headline drift-8">
-                GLA <span class="cyan-accent">Lost &amp; Found.</span>
+                Reclaim What's Yours. <br />
+                <span class="cyan-accent">Campus-Wide Recovery.</span>
             </h1>
 
             <p class="subtext drift-12">
-                Reclaim your lost items. Effortless, secure, campus-wide recovery.
+                The zero-gravity intelligence network linking students, faculty, and campus security for instant lost item matching & verified returns.
             </p>
 
             <div class="hero-actions drift-6">
-                <a href="#report" class="btn-magnetic-primary">Report an Item</a>
-                <a href="#search" class="btn-magnetic-secondary true-glass">Search Network</a>
+                <a href="/register" class="btn-magnetic-primary">Report Lost Item</a>
+                <a href="/login" class="btn-magnetic-secondary true-glass">Browse Claims</a>
             </div>
         </main>
 
-        <section class="telemetry-grid">
-            <div class="telemetry-card true-glass drift-6">
-                <h4 style="font-size: 16px; margin-bottom: 6px;">100% Campus Verified</h4>
-                <p style="font-size: 13px; color: var(--text-muted);">Monitored by GLA Administration</p>
+        <!-- Impact Metrics Section -->
+        <section id="metrics" class="metrics-grid">
+            <div class="metric-card true-glass drift-6">
+                <div class="metric-num">2,840+</div>
+                <div class="metric-label">Items Tracked</div>
+                <p style="font-size: 12px; color: var(--text-muted);">Across all GLA blocks & hostels</p>
             </div>
-            <div class="telemetry-card true-glass drift-8">
-                <h4 style="font-size: 16px; margin-bottom: 6px;">&lt; 24h Match Speed</h4>
-                <p style="font-size: 13px; color: var(--text-muted);">Real-time recovery notifications</p>
+            <div class="metric-card true-glass drift-8">
+                <div class="metric-num" style="color: #34d399;">98.2%</div>
+                <div class="metric-label">Recovery Rate</div>
+                <p style="font-size: 12px; color: var(--text-muted);">Reunited with verified owners</p>
             </div>
-            <div class="telemetry-card true-glass drift-12">
-                <h4 style="font-size: 16px; margin-bottom: 6px;">Encrypted &amp; Private</h4>
-                <p style="font-size: 13px; color: var(--text-muted);">Student identity protection</p>
+            <div class="metric-card true-glass drift-12">
+                <div class="metric-num">&lt; 12h</div>
+                <div class="metric-label">Avg Match Time</div>
+                <p style="font-size: 12px; color: var(--text-muted);">Instant cross-match engine</p>
+            </div>
+            <div class="metric-card true-glass drift-6">
+                <div class="metric-num" style="color: #c084fc;">100%</div>
+                <div class="metric-label">Verified Roll No</div>
+                <p style="font-size: 12px; color: var(--text-muted);">Authenticated student access</p>
             </div>
         </section>
 
+        <!-- How It Works Section -->
+        <section id="how-it-works">
+            <div class="section-header">
+                <span class="section-tag">3-Step Architecture</span>
+                <h2 class="section-title">How GLA Network Works</h2>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card true-glass">
+                    <div class="step-num">01</div>
+                    <h3 style="font-size: 18px; font-weight: 700;">Broadcast Report</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Submit item details, last known campus location (AB1, AB2, Canteen, Library), and optional photo.</p>
+                </div>
+
+                <div class="step-card true-glass">
+                    <div class="step-num">02</div>
+                    <h3 style="font-size: 18px; font-weight: 700;">Automated Matching</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Intelligent indexing engine matches lost item parameters against newly reported found items.</p>
+                </div>
+
+                <div class="step-card true-glass">
+                    <div class="step-num">03</div>
+                    <h3 style="font-size: 18px; font-weight: 700;">Verified Claim</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Verify Roll No identity & safely retrieve your belongings at campus security points.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categories">
+            <div class="section-header">
+                <span class="section-tag">Campus Item Directory</span>
+                <h2 class="section-title">Popular Item Categories</h2>
+            </div>
+
+            <div class="category-grid">
+                <div class="category-card true-glass">
+                    <div class="category-icon">🪪</div>
+                    <h3 style="font-size: 16px; font-weight: 700;">GLA Student ID Cards</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);">Roll number & library cards lost across academic blocks</p>
+                </div>
+
+                <div class="category-card true-glass">
+                    <div class="category-icon">📱</div>
+                    <h3 style="font-size: 16px; font-weight: 700;">Smartphones & Earbuds</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);">AirPods, mobile phones, chargers & power banks</p>
+                </div>
+
+                <div class="category-card true-glass">
+                    <div class="category-icon">🔑</div>
+                    <h3 style="font-size: 16px; font-weight: 700;">Hostel Keys & Fobs</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);">Hostel room keys, bike keys & security fobs</p>
+                </div>
+
+                <div class="category-card true-glass">
+                    <div class="category-icon">💻</div>
+                    <h3 style="font-size: 16px; font-weight: 700;">Laptops & Tech</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);">MacBooks, Dell, HP laptops & lab equipment</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
         <footer class="footer">
             <div>&copy; GLA UNIVERSITY LOST &amp; FOUND</div>
+            <div>Mathura, Uttar Pradesh • Official Campus Network</div>
         </footer>
     </div>
 </body>
