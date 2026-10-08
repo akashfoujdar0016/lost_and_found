@@ -211,7 +211,6 @@ const Landing = () => {
             {/* Minimal Editorial Footer */}
             <footer className="relative z-10 border-t border-white/[0.06] py-10 px-6 sm:px-12 font-mono text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>&copy; GLA UNIVERSITY LOST &amp; FOUND</div>
-                <div>AETHERIUM $5k AGENCY UX</div>
             </footer>
         </div>
     );
