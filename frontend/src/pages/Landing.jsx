@@ -202,19 +202,19 @@ const Landing = () => {
                     {/* Official Campus Badge */}
                     <div className="inline-flex items-center gap-2.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full true-glass border border-white/10 max-w-full">
                         <span className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF] shrink-0"></span>
-                        <span className="text-[10px] sm:text-xs font-mono font-semibold tracking-wider text-slate-300 uppercase truncate">
+                        <span className="text-[10px] sm:text-xs font-mono font-semibold tracking-wider text-slate-300 uppercase leading-none">
                             GLA University Official Campus Recovery Platform
                         </span>
                     </div>
 
                     {/* Headline */}
-                    <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-[1.08] sm:leading-[1.02] tracking-[-0.03em] text-white">
+                    <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-[1.1] sm:leading-[1.02] tracking-[-0.03em] text-white">
                         Reclaim What's Yours. <br className="hidden sm:inline" />
                         <span className="text-[#00E5FF] drop-shadow-[0_0_45px_rgba(0,229,255,0.4)]">Campus-Wide Recovery.</span>
                     </h1>
 
                     {/* Subtext */}
-                    <p className="text-slate-400 text-base sm:text-xl md:text-2xl font-normal leading-relaxed max-w-3xl tracking-tight">
+                    <p className="text-slate-400 text-sm sm:text-xl md:text-2xl font-normal leading-relaxed max-w-3xl tracking-tight">
                         The intelligent zero-gravity network linking students, faculty, and campus security for instant lost item matching, verified claims, and safe return.
                     </p>
 
@@ -230,7 +230,7 @@ const Landing = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search lost items (e.g. 'AirPods AB1', 'Roll No Card')..."
-                                    className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none px-3 py-2"
+                                    className="borderless-input w-full text-xs sm:text-sm text-white placeholder-slate-500 px-3 py-2"
                                 />
                             </div>
                             <button

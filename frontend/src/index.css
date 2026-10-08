@@ -56,26 +56,33 @@ section[id] {
 }
 
 /* Anti-Gravity Form Inputs & Select Dropdowns */
-.input, input[type="text"], input[type="date"], input[type="time"], input[type="email"], input[type="password"], select, textarea {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 16px !important;
-    padding: 14px 18px !important;
-    font-size: 14px !important;
-    outline: none !important;
+.input, .form-control, input[type="date"], input[type="time"], input[type="email"], input[type="password"], select, textarea {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-size: 14px;
+    outline: none;
     backdrop-filter: blur(16px);
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.borderless-input {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 .input::placeholder, input::placeholder, textarea::placeholder {
-    color: #71717a !important;
+    color: #71717a;
 }
 
-.input:focus, input:focus, select:focus, textarea:focus {
-    border-color: rgba(0, 229, 255, 0.5) !important;
-    box-shadow: 0 0 25px rgba(0, 229, 255, 0.18) !important;
-    background-color: rgba(255, 255, 255, 0.07) !important;
+.input:focus, .form-control:focus, select:focus, textarea:focus {
+    border-color: rgba(0, 229, 255, 0.5);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.18);
+    background-color: rgba(255, 255, 255, 0.07);
 }
 
 select option {
