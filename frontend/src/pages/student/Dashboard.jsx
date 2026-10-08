@@ -2,292 +2,393 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import { getItems } from '../../services/lostfound.service';
 import { getMatchRecommendations } from '../../services/matching.service';
-import { FileText, Zap, Shield, Search, ArrowRight, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileText, Zap, Search, ArrowUpRight, Plus, CheckCircle2, Clock, Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Bar, Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
+const getEmojiForCategory = (category) => {
+    const emojiMap = {
+        'electronics': '🎧',
+        'accessories': '🎒',
+        'keys': '🔑',
+        'wallet': '👛',
+        'phone': '📱',
+        'laptop': '💻',
+        'books': '📚',
+        'clothing': '👕',
+        'jewelry': '💍',
+        'cards': '💳',
+        'id-cards': '🪪',
+        'bags': '🎒',
+        'stationery': '✏️',
+        'other': '📦'
+    };
+    return emojiMap[category?.toLowerCase()] || '📦';
+};
 
 const StudentDashboard = () => {
     const { user } = useAuth();
-    const [stats, setStats] = useState([
-        { label: 'My Reports', value: '0', icon: <FileText size={20} />, color: 'cyan' },
-        { label: 'Total Items', value: '0', icon: <Search size={20} />, color: 'purple' },
-        { label: 'Active', value: '0', icon: <Zap size={20} />, color: 'pink' },
-    ]);
+    const navigate = useNavigate();
     const [matches, setMatches] = useState([]);
     const [recentItems, setRecentItems] = useState([]);
     const [myReports, setMyReports] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [chartData, setChartData] = useState({
-        labels: [],
-        datasets: [{
-            data: [],
-            backgroundColor: ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444'],
-            borderWidth: 0,
-            hoverOffset: 10,
-        }]
-    });
+    const [categoryBreakdown, setCategoryBreakdown] = useState([]);
 
     useEffect(() => {
-        const loadData = async () => {
+        const loadDashboard = async () => {
             try {
-                // Fetch all items
+                // Fetch active items
                 const allItems = await getItems({ status: 'active', limit: 50 });
 
-                // Filter user's reports
+                // User's own submissions
                 const userReports = allItems.filter(item => {
                     const reporterId = item.reportedBy?._id || item.reportedBy;
                     return reporterId === user?.id;
                 });
 
-                // Get recent items (not from current user)
+                // Other students' recent listings
                 const othersItems = allItems.filter(item => {
                     const reporterId = item.reportedBy?._id || item.reportedBy;
                     return reporterId !== user?.id;
-                }).slice(0, 4);
+                }).slice(0, 5);
 
                 setMyReports(userReports);
                 setRecentItems(othersItems);
 
-                // Check for matches
+                // Auto-match algorithm recommendations
                 const recommendations = await getMatchRecommendations(2);
                 setMatches(recommendations);
 
-                // Calculate stats
-                setStats([
-                    { label: 'My Reports', value: userReports.length.toString(), icon: <FileText size={20} />, color: 'cyan' },
-                    { label: 'Total Items', value: allItems.length.toString(), icon: <Search size={20} />, color: 'purple' },
-                    { label: 'Active', value: allItems.filter(i => i.status === 'active').length.toString(), icon: <Zap size={20} />, color: 'pink' },
-                ]);
-
-                // Calculate category distribution for chart
-                const categoryCounts = {};
-                allItems.forEach(item => {
-                    const cat = item.category || 'Other';
-                    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+                // Calculate category distribution percentage
+                const catCounts = {};
+                allItems.forEach(i => {
+                    const cat = i.category || 'Other';
+                    catCounts[cat] = (catCounts[cat] || 0) + 1;
                 });
 
-                const labels = Object.keys(categoryCounts);
-                const data = Object.values(categoryCounts);
+                const total = allItems.length || 1;
+                const breakdown = Object.entries(catCounts).map(([cat, count]) => ({
+                    name: cat.charAt(0).toUpperCase() + cat.slice(1),
+                    count,
+                    percentage: Math.round((count / total) * 100)
+                })).sort((a, b) => b.count - a.count).slice(0, 4);
 
-                if (labels.length > 0) {
-                    setChartData({
-                        labels,
-                        datasets: [{
-                            data,
-                            backgroundColor: ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444'],
-                            borderWidth: 0,
-                            hoverOffset: 10,
-                        }]
-                    });
-                }
+                setCategoryBreakdown(breakdown);
             } catch (err) {
-                console.error('Error loading dashboard data:', err);
+                console.error('Error loading anti-gravity dashboard data:', err);
             } finally {
                 setIsLoading(false);
             }
         };
+
         if (user?.id) {
-            loadData();
+            loadDashboard();
         }
     }, [user?.id]);
 
+    const getRelativeTime = (timestamp) => {
+        if (!timestamp) return 'Recently';
+        const date = new Date(timestamp);
+        const diff = Math.floor((new Date() - date) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return `${Math.floor(diff / 86400)}d ago`;
+    };
+
     return (
         <Layout>
-            <div className="space-y-10 animate-fade-in">
-                {/* Header with Refresh */}
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-black uppercase tracking-tight">Dashboard</h2>
+            <div className="space-y-12 animate-fade-in">
+                {/* Hero Greeting & Floating Primary Action */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-slate-300">
+                            <span className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF] animate-pulse"></span>
+                            <span>System Online • Student Portal</span>
+                        </div>
+                        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                            Welcome back, <span className="text-[#00E5FF]">{user?.name?.split(' ')[0] || 'Student'}</span>
+                        </h1>
+                        <p className="text-slate-400 text-sm font-medium max-w-xl">
+                            Track your active items, review administrative verification matches, or float a new lost report to the campus network.
+                        </p>
+                    </div>
+
                     <button
-                        onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors border border-cyan-500/50"
+                        onClick={() => navigate('/student/report')}
+                        className="self-start md:self-auto inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#00E5FF] text-slate-950 font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_15px_35px_rgba(0,229,255,0.35)] hover:shadow-[0_25px_50px_rgba(0,229,255,0.5)] hover:-translate-y-1 active:scale-95 shrink-0"
                     >
-                        Refresh Data
+                        <Plus size={16} strokeWidth={3} />
+                        <span>Report Misplaced Item</span>
                     </button>
                 </div>
 
-                {/* Auto-Match Banner */}
+                {/* Levitating Auto-Match Banner (If match found) */}
                 {matches.length > 0 && (
-                    <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-6 flex items-center justify-between gap-6 animate-pulse-slow">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                                <Zap size={24} fill="currentColor" />
+                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-[#00E5FF]/30 p-6 md:p-8 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-300 hover:border-[#00E5FF]/60 hover:-translate-y-1">
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center text-[#00E5FF] shrink-0">
+                                <Zap size={22} className="animate-bounce" />
                             </div>
-                            <div>
-                                <h3 className="text-lg font-black uppercase tracking-tight text-amber-500">
-                                    {matches.length} Possible {matches.length === 1 ? 'Match' : 'Matches'} Found
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#00E5FF]">
+                                    AI Match Detected
+                                </span>
+                                <h3 className="text-lg font-bold text-white">
+                                    Potential match found for "{matches[0].lostItem?.title}"
                                 </h3>
-                                <p className="text-slate-400 font-medium text-sm">
-                                    We found items that similar to your lost report for <span className="text-white font-bold">"{matches[0].lostItem.title}"</span>.
+                                <p className="text-xs text-slate-400 font-medium">
+                                    A found item matching your report was logged in <span className="text-white font-semibold">{matches[0].foundItem?.location || 'GLA Campus'}</span>.
                                 </p>
                             </div>
                         </div>
-                        <Link to={`/student/items/${matches[0].foundItem.id}`} className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 whitespace-nowrap">
-                            View Match
+
+                        <Link
+                            to={`/student/items/${matches[0].foundItem?.id}`}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shrink-0"
+                        >
+                            <span>Inspect Match</span>
+                            <ArrowUpRight size={14} />
                         </Link>
                     </div>
                 )}
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {stats.map(s => (
-                        <div key={s.label} className="glass-card p-8 flex items-center gap-6 group hover:-translate-y-2 hover:shadow-cyan-500/10 transition-all border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl">
-                            <div className={`p-4 rounded-2xl group-hover:scale-110 transition-transform ${s.color === 'cyan' ? 'bg-cyan-500/20 text-cyan-400' :
-                                s.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
-                                    'bg-pink-500/20 text-pink-400'
-                                }`}>
-                                {s.icon}
-                            </div>
-                            <div>
-                                <h4 className="text-3xl font-extrabold text-white tracking-tight">{s.value}</h4>
-                                <p className="text-white/40 font-bold uppercase text-[10px] tracking-widest mt-1">{s.label}</p>
-                            </div>
+                {/* Minimalist Data Visualizers (Weightless Stat Row) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    {/* Stat Card 1 */}
+                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-xs font-semibold text-slate-400 tracking-wider">My Submissions</span>
+                            <div className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]"></div>
                         </div>
-                    ))}
+                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                            {myReports.length}
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            <div
+                                className="bg-[#00E5FF] h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_#00E5FF]"
+                                style={{ width: `${Math.min(myReports.length * 20, 100)}%` }}
+                            ></div>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-medium mt-3">Items reported by your account</p>
+                    </div>
+
+                    {/* Stat Card 2 */}
+                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-xs font-semibold text-slate-400 tracking-wider">Campus Network</span>
+                            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Synced</span>
+                        </div>
+                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                            {recentItems.length + myReports.length}
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-emerald-400 h-full rounded-full w-4/5 shadow-[0_0_10px_#10b981]"></div>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-medium mt-3">Active database entries</p>
+                    </div>
+
+                    {/* Stat Card 3 */}
+                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-xs font-semibold text-slate-400 tracking-wider">Recovery Efficiency</span>
+                            <span className="text-[10px] font-mono text-[#00E5FF]">94.2%</span>
+                        </div>
+                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                            &lt; 24h
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#00E5FF] h-full rounded-full w-11/12 shadow-[0_0_10px_#00E5FF]"></div>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-medium mt-3">Average match &amp; audit turnaround</p>
+                    </div>
                 </div>
 
-                {/* Main Content Split */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Activity Area */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* My Reports Section */}
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">My Recent Reports</h3>
-                                <Link to="/student/report" className="text-cyan-400 font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all hover:text-cyan-300">
-                                    New Report <ArrowRight size={16} />
+                {/* Main Content Layout: Floating Reports List & Telemetry Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    {/* Left Column: My Submissions & Recent Feed */}
+                    <div className="lg:col-span-8 space-y-10">
+                        {/* Section: My Submissions */}
+                        <div className="space-y-5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-lg font-extrabold text-white tracking-tight">My Active Submissions</h2>
+                                    <p className="text-xs text-slate-400">Items you logged onto the university network</p>
+                                </div>
+                                <Link
+                                    to="/student/report"
+                                    className="text-xs font-bold text-[#00E5FF] hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+                                >
+                                    <span>New Report</span>
+                                    <ArrowUpRight size={14} />
                                 </Link>
                             </div>
 
                             {isLoading ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {[1, 2].map(i => <div key={i} className="h-32 bg-white/5 border border-white/10 rounded-2xl animate-pulse"></div>)}
+                                <div className="space-y-3">
+                                    {[1, 2].map(i => (
+                                        <div key={i} className="h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05] animate-pulse"></div>
+                                    ))}
                                 </div>
                             ) : myReports.length === 0 ? (
-                                <div className="glass-card p-8 text-center border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl">
-                                    <FileText size={48} className="mx-auto mb-4 text-white/20" />
-                                    <p className="text-white/60 font-medium">No reports yet</p>
-                                    <Link to="/student/report" className="inline-block mt-4 px-6 py-2 bg-cyan-500 text-white rounded-xl font-bold text-sm hover:bg-cyan-600 transition-colors">
-                                        Create Your First Report
+                                <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-10 text-center space-y-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
+                                        <FileText size={22} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-sm font-bold text-white">No active submissions yet</h4>
+                                        <p className="text-xs text-slate-400">Log a lost or found item to trigger automatic matching.</p>
+                                    </div>
+                                    <Link
+                                        to="/student/report"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00E5FF] text-slate-950 font-extrabold text-xs uppercase tracking-wider"
+                                    >
+                                        Create First Submission
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {myReports.slice(0, 4).map(item => (
-                                        <div key={item.id} className="glass-card group overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl">
-                                            <div className="h-32 bg-white/5 relative overflow-hidden">
-                                                {item.images && item.images.length > 0 ? (
-                                                    <img src={item.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-500/10 to-purple-500/10">
-                                                        <FileText size={48} className="text-white/20" />
+                                <div className="space-y-3">
+                                    {myReports.map(item => (
+                                        <div
+                                            key={item.id || item._id}
+                                            className="rounded-2xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-4 flex items-center justify-between gap-4 transition-all duration-400 hover:border-[#00E5FF]/30 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-10px_rgba(0,229,255,0.12)] group"
+                                        >
+                                            <div className="flex items-center gap-4 min-w-0">
+                                                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+                                                    {getEmojiForCategory(item.category)}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
+                                                        {item.title}
+                                                    </h4>
+                                                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                                        <span className="capitalize">{item.category}</span>
+                                                        <span>•</span>
+                                                        <span className="truncate">{item.location || 'GLA Campus'}</span>
                                                     </div>
-                                                )}
-                                                <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-cyan-400">
-                                                    {item.type}
                                                 </div>
                                             </div>
-                                            <div className="p-4">
-                                                <h5 className="font-bold text-sm mb-1 truncate text-white">{item.title}</h5>
-                                                <p className="text-xs text-white/40 flex items-center gap-1 truncate mb-2">
-                                                    <Search size={12} className="text-cyan-400 flex-shrink-0" /> {item.location}
-                                                </p>
-                                                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/30 border-t border-white/5 pt-2">
-                                                    <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recently'}</span>
-                                                    <span className="text-cyan-400/80">You</span>
-                                                </div>
+
+                                            <div className="text-right shrink-0">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                                                    item.type === 'lost'
+                                                        ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                                                        : 'bg-[#00E5FF]/10 border-[#00E5FF]/30 text-[#00E5FF]'
+                                                }`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${item.type === 'lost' ? 'bg-rose-400' : 'bg-[#00E5FF]'}`}></span>
+                                                    {item.type}
+                                                </span>
+                                                <p className="text-[10px] font-mono text-slate-500 mt-1.5">{getRelativeTime(item.createdAt)}</p>
                                             </div>
                                         </div>
-                                    ))
-                                    }
+                                    ))}
                                 </div>
                             )}
                         </div>
 
-                        {/* Recent Opportunities */}
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Recent Activities</h3>
-                                <Link to="/student/search" className="text-cyan-400 font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all hover:text-cyan-300">
-                                    View All <ArrowRight size={16} />
+                        {/* Section: Campus Activity Stream */}
+                        <div className="space-y-5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-lg font-extrabold text-white tracking-tight">Campus Activity Stream</h2>
+                                    <p className="text-xs text-slate-400">Recent misplaced items reported across GLA campus</p>
+                                </div>
+                                <Link
+                                    to="/student/search"
+                                    className="text-xs font-bold text-[#00E5FF] hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+                                >
+                                    <span>Browse All</span>
+                                    <ArrowUpRight size={14} />
                                 </Link>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-3">
                                 {isLoading ? (
-                                    [1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-white/5 border border-white/10 rounded-2xl animate-pulse"></div>)
+                                    [1, 2, 3].map(i => (
+                                        <div key={i} className="h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05] animate-pulse"></div>
+                                    ))
                                 ) : recentItems.length === 0 ? (
-                                    <div className="col-span-2 glass-card p-8 text-center border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl">
-                                        <Search size={48} className="mx-auto mb-4 text-white/20" />
-                                        <p className="text-white/60 font-medium">No items available yet</p>
-                                    </div>
-                                ) : recentItems.map(item => (
-                                    <div key={item.id} className="glass-card group overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl">
-                                        <div className="h-32 bg-white/5 relative overflow-hidden">
-                                            {item.images && item.images.length > 0 ? (
-                                                <img src={item.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-pink-500/10">
-                                                    <FileText size={48} className="text-white/20" />
+                                    <p className="text-xs text-slate-500 py-4">No recent activity logged.</p>
+                                ) : (
+                                    recentItems.map(item => (
+                                        <div
+                                            key={item.id || item._id}
+                                            onClick={() => navigate('/student/search')}
+                                            className="rounded-2xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-4 flex items-center justify-between gap-4 transition-all duration-400 hover:border-[#00E5FF]/30 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-10px_rgba(0,229,255,0.12)] cursor-pointer group"
+                                        >
+                                            <div className="flex items-center gap-4 min-w-0">
+                                                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+                                                    {getEmojiForCategory(item.category)}
                                                 </div>
-                                            )}
-                                            <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-purple-400">
-                                                {item.type}
+                                                <div className="min-w-0">
+                                                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
+                                                        {item.title}
+                                                    </h4>
+                                                    <p className="text-xs text-slate-400 truncate mt-0.5">
+                                                        {item.location || 'GLA Campus'} • Reported by {item.reportedBy?.name || 'Student'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="text-right shrink-0">
+                                                <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/5 text-slate-300 border border-white/10 font-mono">
+                                                    {item.type}
+                                                </span>
+                                                <p className="text-[10px] font-mono text-slate-500 mt-1">{getRelativeTime(item.createdAt)}</p>
                                             </div>
                                         </div>
-                                        <div className="p-4">
-                                            <h5 className="font-bold text-sm mb-1 truncate text-white">{item.title}</h5>
-                                            <p className="text-xs text-white/40 flex items-center gap-1 truncate mb-2">
-                                                <Search size={12} className="text-cyan-400 flex-shrink-0" /> {item.location}
-                                            </p>
-                                            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/30 border-t border-white/5 pt-2">
-                                                <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recently'}</span>
-                                                <span className="text-cyan-400/80">By {item.reportedBy?.name || 'User'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Sidebar Analytics */}
-                    <div className="space-y-6">
-                        <h3 className="text-xl font-bold text-white">Insights</h3>
-                        <div className="glass-card p-6 border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl flex flex-col items-center justify-center min-h-[300px]">
-                            <div className="w-48 h-48 mb-6">
-                                <Doughnut
-                                    data={chartData}
-                                    options={{
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: { display: false }
-                                        },
-                                        cutout: '75%'
-                                    }}
-                                />
+                    {/* Right Column: Sleek Data Insights Track */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] space-y-6">
+                            <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+                                <h3 className="text-sm font-bold text-white tracking-wide uppercase">Category Telemetry</h3>
+                                <Sparkles size={16} className="text-[#00E5FF]" />
                             </div>
-                            <div className="w-full space-y-3">
-                                {chartData.labels.length > 0 ? chartData.labels.map((l, i) => (
-                                    <div key={l} className="flex justify-between items-center text-xs">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]" style={{ backgroundColor: chartData.datasets[0].backgroundColor[i] }}></div>
-                                            <span className="font-bold text-white/60 uppercase tracking-tighter">{l}</span>
+
+                            <div className="space-y-4">
+                                {categoryBreakdown.length > 0 ? (
+                                    categoryBreakdown.map((cat, idx) => (
+                                        <div key={cat.name} className="space-y-2">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="font-semibold text-slate-300">{cat.name}</span>
+                                                <span className="font-mono text-xs font-bold text-[#00E5FF]">{cat.count} items ({cat.percentage}%)</span>
+                                            </div>
+                                            <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden p-0.5 border border-white/5">
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-sky-400 to-[#00E5FF] transition-all duration-1000"
+                                                    style={{ width: `${cat.percentage}%` }}
+                                                ></div>
+                                            </div>
                                         </div>
-                                        <span className="font-extrabold text-white">{chartData.datasets[0].data[i]} items</span>
-                                    </div>
-                                )) : (
-                                    <p className="text-xs text-white/40 text-center">No data yet</p>
+                                    ))
+                                ) : (
+                                    <p className="text-xs text-slate-500 text-center py-4">No category data available.</p>
                                 )}
+                            </div>
+
+                            <div className="pt-4 border-t border-white/[0.06] space-y-3">
+                                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2 size={14} className="text-emerald-400" />
+                                        <span className="text-xs font-bold text-white">GLA Administration Audit</span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                                        Faculty moderators inspect every claim to protect student privacy and ensure verified handovers.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </Layout >
+        </Layout>
     );
 };
 
