@@ -238,23 +238,44 @@ app.post(['/api/upload', '/upload'], verifyToken, async (req, res) => {
 // Authentication Routes
 app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
     try {
-        const { email, password, name, role, identifier, ...rest } = req.body;
+        const { email, password, name, role, identifier, universityEmail, personalEmail, ...rest } = req.body;
         
-        // Check if user exists
-        let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ error: 'User already exists' });
+        if (!email || !password || !name || !identifier) {
+            return res.status(400).json({ error: 'Please provide all required registration fields' });
+        }
+
+        const cleanEmail = email.toLowerCase().trim();
+        const cleanUniEmail = (universityEmail || email).toLowerCase().trim();
+        const cleanPersonalEmail = (personalEmail || email).toLowerCase().trim();
+        const cleanIdentifier = identifier.trim();
+
+        // Check if user exists by email, university email, personal email, or roll no/faculty ID
+        const existingUser = await User.findOne({
+            $or: [
+                { email: cleanEmail },
+                { universityEmail: cleanUniEmail },
+                { personalEmail: cleanPersonalEmail },
+                { identifier: cleanIdentifier }
+            ]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'An account with this Email or Roll No / Faculty ID already exists. Please Sign In.' });
+        }
 
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create user
-        user = new User({
-            email,
+        const user = new User({
+            email: cleanEmail,
+            universityEmail: cleanUniEmail,
+            personalEmail: cleanPersonalEmail,
             password: hashedPassword,
-            name,
-            role,
-            identifier,
+            name: name.trim(),
+            role: role || 'student',
+            identifier: cleanIdentifier,
             ...rest
         });
 
@@ -263,11 +284,14 @@ app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
         // Create token
         const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         
-        res.status(201).json({ token, user: { id: user._id, email, name, role } });
+        res.status(201).json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role, identifier: user.identifier } });
     } catch (error) {
         console.error('Registration Error Details:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ error: 'An account with this Email or Roll No / Faculty ID already exists' });
+        }
         res.status(500).json({ 
-            error: error.message,
+            error: error.message || 'Server error during registration',
             details: error.errors ? Object.keys(error.errors).map(key => error.errors[key].message) : null
         });
     }
@@ -276,16 +300,28 @@ app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     try {
         const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        const cleanSearch = email.toLowerCase().trim();
+        const user = await User.findOne({
+            $or: [
+                { email: cleanSearch },
+                { universityEmail: cleanSearch },
+                { personalEmail: cleanSearch },
+                { identifier: email.trim() }
+            ]
+        });
         
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials. User not found.' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials. Incorrect password.' });
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+        const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         
-        res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
+        res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role, identifier: user.identifier } });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -19,7 +19,8 @@ export const loginWithEmail = async (email, password) => {
         };
     } catch (error) {
         console.error('Login error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error || 'Invalid email or password');
+        const serverError = error.response?.data?.error || error.response?.data?.details?.[0] || error.message;
+        throw new Error(serverError || 'Invalid email or password');
     }
 };
 
@@ -46,7 +47,8 @@ export const registerUser = async (email, password, userData) => {
         };
     } catch (error) {
         console.error('Registration error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error || 'Registration failed');
+        const serverError = error.response?.data?.error || error.response?.data?.details?.[0] || error.message;
+        throw new Error(serverError || 'Registration failed');
     }
 };
 
