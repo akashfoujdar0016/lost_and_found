@@ -13,10 +13,7 @@ if (!MONGODB_URI) {
 
 const seedData = async () => {
     try {
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(MONGODB_URI);
         console.log('Connected to MongoDB for seeding...');
 
         // Clear existing data
