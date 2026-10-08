@@ -242,7 +242,7 @@ const Landing = () => {
                         </div>
                     </form>
 
-                    {/* Hero Responsive Action Buttons & Statistics Pill */}
+                    {/* Hero Responsive Action Buttons */}
                     <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-5 pt-2 sm:pt-4 items-stretch sm:items-center">
                         <button
                             onClick={handleRegister}
@@ -250,44 +250,6 @@ const Landing = () => {
                         >
                             Report Lost Item
                         </button>
-
-                        <button
-                            onClick={handleLogin}
-                            className="w-full sm:w-auto text-center px-8 py-3.5 sm:py-4 rounded-full true-glass text-white font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all border border-white/15"
-                        >
-                            Explore Claims Database
-                        </button>
-
-                        <div className="flex items-center justify-center gap-3 px-5 py-3 rounded-full true-glass border border-white/10 text-xs font-mono text-slate-400 w-full sm:w-auto">
-                            <span className="text-[#00E5FF] font-bold">98.4%</span> Recovery Match Rate
-                        </div>
-                    </div>
-                </section>
-
-                {/* 2. CAMPUS IMPACT STATS BAR */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    <div className="true-glass rounded-3xl p-5 sm:p-6 border border-white/10 space-y-2">
-                        <div className="text-3xl sm:text-4xl font-black text-[#00E5FF] tracking-tight">2,840+</div>
-                        <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Items Processed</div>
-                        <p className="text-[11px] text-slate-500">Tracked across all GLA blocks & departments</p>
-                    </div>
-
-                    <div className="true-glass rounded-3xl p-5 sm:p-6 border border-white/10 space-y-2">
-                        <div className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">98.2%</div>
-                        <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Successful Return</div>
-                        <p className="text-[11px] text-slate-500">Reunited with verified student owners</p>
-                    </div>
-
-                    <div className="true-glass rounded-3xl p-5 sm:p-6 border border-white/10 space-y-2">
-                        <div className="text-3xl sm:text-4xl font-black text-[#00E5FF] tracking-tight">&lt; 12 Hours</div>
-                        <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Average Match Time</div>
-                        <p className="text-[11px] text-slate-500">Instant AI pattern matching notifications</p>
-                    </div>
-
-                    <div className="true-glass rounded-3xl p-5 sm:p-6 border border-white/10 space-y-2">
-                        <div className="text-3xl sm:text-4xl font-black text-purple-400 tracking-tight">100%</div>
-                        <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Verified Identity</div>
-                        <p className="text-[11px] text-slate-500">Authenticated via official GLA Roll No.</p>
                     </div>
                 </section>
 
