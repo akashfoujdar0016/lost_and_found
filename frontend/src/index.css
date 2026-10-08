@@ -14,127 +14,167 @@ section[id] {
 
 :root {
     /* Typographic System */
-    --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-accent: "Outfit", "Inter", sans-serif;
+    --font-primary: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", "Berkeley Mono", "Fira Code", monospace;
 
-    /* Corporate Anti-Gravity Matte Dark Palette */
-    --background: #090b0e;
-    --surface: #11141b;
-    --surface-elevated: #161a23;
-    --surface-hover: #1c212d;
-    
-    --text-primary: #f8fafc;
+    /* Aetherium Anti-Gravity Deep Space Palette */
+    --space-void: #000000;
+    --obsidian-base: #07080a;
+    --graphite-panel: #111318;
+    --graphite-elevated: #161922;
+    --graphite-hover: #1c202b;
+
+    --text-starlight: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    
-    --accent-metallic: #38bdf8;
-    --accent-metallic-muted: rgba(56, 189, 248, 0.15);
-    
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-metallic: rgba(56, 189, 248, 0.3);
 
-    --shadow-anti-gravity: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    --shadow-anti-gravity-hover: 0 35px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(56, 189, 248, 0.2);
+    /* Aerospace Telemetry Accents */
+    --ionized-blue: #38bdf8;
+    --aerospace-amber: #f59e0b;
+    --mint-titanium: #34d399;
+    --crimson-alert: #fb7185;
 
-    --radius-card: 20px;
+    /* Titanium Borders & Elevation */
+    --border-titanium: rgba(255, 255, 255, 0.07);
+    --border-titanium-active: rgba(56, 189, 248, 0.35);
+    --border-amber-active: rgba(245, 158, 11, 0.35);
+
+    --shadow-anti-gravity-1: 0 15px 35px -5px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --shadow-anti-gravity-2: 0 30px 70px -10px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(255, 255, 255, 0.07);
+    --shadow-anti-gravity-active: 0 45px 100px -15px rgba(0, 0, 0, 0.98), 0 0 0 1px rgba(56, 189, 248, 0.25);
+
+    --radius-card: 18px;
     --radius-input: 12px;
 }
 
 @layer base {
     body {
-        @apply bg-[#090b0e] text-[#f8fafc] antialiased overflow-x-hidden transition-colors duration-300;
+        @apply bg-[#000000] text-[#f8fafc] antialiased overflow-x-hidden transition-colors duration-300;
         font-family: var(--font-primary);
-        background-color: #090b0e;
+        background-color: #000000;
     }
 
     h1, .text-3xl {
         @apply font-black tracking-tight leading-tight text-white;
-        font-family: var(--font-accent);
     }
 
     h2, .text-2xl {
         @apply font-extrabold tracking-tight text-white;
-        font-family: var(--font-accent);
     }
 
     h3, .text-xl {
         @apply font-bold tracking-tight text-white;
-        font-family: var(--font-accent);
+    }
+
+    code, pre, .font-mono {
+        font-family: var(--font-mono);
     }
 }
 
-/* Corporate Anti-Gravity Floating Glass Cards */
-.glass-card, .anti-gravity-card {
-    background: rgba(17, 20, 27, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+/* Levitating Spatial Glass Panels */
+.glass-card, .anti-gravity-panel {
+    background: rgba(17, 19, 24, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: var(--radius-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: var(--shadow-anti-gravity);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-anti-gravity-2);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
 }
 
-.glass-card:hover, .anti-gravity-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-anti-gravity-hover);
-    border-color: rgba(56, 189, 248, 0.25);
+.glass-card:hover, .anti-gravity-panel:hover {
+    transform: translateY(-6px) translateZ(10px);
+    box-shadow: var(--shadow-anti-gravity-active);
+    border-color: rgba(56, 189, 248, 0.3);
 }
 
-/* Subtle Geometric Grid Overlay */
+/* Deep Space Grid Radar Overlay */
 .bg-grid-pattern {
-    background-size: 40px 40px;
+    background-size: 48px 48px;
     background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        radial-gradient(circle at 50% 50%, rgba(17, 19, 24, 0.5) 0%, #000000 100%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
-/* Inputs & Form Fields */
+/* Spatial Inputs & Technical Control Elements */
 .input {
-    @apply w-full px-5 py-3.5 bg-[#14171f] border border-white/10 rounded-xl text-white outline-none transition-all font-medium placeholder:text-slate-500;
+    @apply w-full px-5 py-3.5 bg-[#161922] border border-white/10 rounded-xl text-white outline-none transition-all font-medium placeholder:text-slate-500;
 }
 
 .input:focus {
     @apply border-sky-400/60 ring-2 ring-sky-400/20 shadow-md;
 }
 
-/* Buttons */
+/* Buttons with Easing Dynamics */
 .btn {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs cursor-pointer transition-all border-none disabled:opacity-50 active:scale-95;
 }
 
 .btn-primary {
-    @apply bg-sky-400 text-slate-950 font-extrabold shadow-lg shadow-sky-400/10 hover:bg-sky-300 hover:shadow-sky-400/20;
+    background-color: #38bdf8;
+    color: #020617;
+    font-weight: 800;
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: #7dd3fc;
+}
+
+.btn-amber {
+    background-color: #f59e0b;
+    color: #020617;
+    font-weight: 800;
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.2);
+}
+
+.btn-amber:hover {
+    background-color: #fbbf24;
 }
 
 .btn-secondary {
-    @apply bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-sm;
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn-ghost {
-    @apply bg-transparent text-slate-400 hover:text-white hover:bg-white/5;
+    background-color: transparent;
+    color: #94a3b8;
 }
 
-/* Status Badges */
+.btn-ghost:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Technical Telemetry Badges */
 .badge {
     @apply px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-all;
 }
 
 .badge-open {
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: rgba(52, 211, 153, 0.3);
     color: #34d399;
-    background-color: rgba(16, 185, 129, 0.1);
+    background-color: rgba(52, 211, 153, 0.1);
 }
 
 .badge-claimed {
     border-color: rgba(245, 158, 11, 0.3);
-    color: #fbbf24;
+    color: #f59e0b;
     background-color: rgba(245, 158, 11, 0.1);
 }
 
 .badge-error {
-    border-color: rgba(244, 63, 94, 0.3);
+    border-color: rgba(251, 113, 133, 0.3);
     color: #fb7185;
-    background-color: rgba(244, 63, 94, 0.1);
+    background-color: rgba(251, 113, 133, 0.1);
 }
 
 .metallic-text {
@@ -148,6 +188,13 @@ section[id] {
     @apply font-semibold px-3 py-1 rounded-full text-xs;
 }
 
+.amber-badge {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    @apply font-semibold px-3 py-1 rounded-full text-xs;
+}
+
 /* Spinner */
 .spinner {
     width: 44px;
@@ -155,7 +202,7 @@ section[id] {
     border: 3px solid rgba(255, 255, 255, 0.1);
     border-top: 3px solid #38bdf8;
     border-radius: 50%;
-    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: spin 0.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes spin {
@@ -179,4 +226,4 @@ section[id] {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
-}
+}
