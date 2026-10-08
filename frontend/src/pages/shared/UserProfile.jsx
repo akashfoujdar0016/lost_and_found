@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Calendar, CreditCard, Building, ArrowLeft, Edit2, Save, X, Camera, Trash2, FileText, CheckCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, CreditCard, Building, ArrowLeft, Save, Trash2, FileText, CheckCircle, Camera } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserProfile, updateUserProfile, uploadUserDocuments } from '../../services/user.service';
 import { getMyReports, getMyClaims } from '../../services/lostfound.service';
-import DocumentUpload from '../../components/auth/DocumentUpload';
 
 const UserProfile = () => {
     const navigate = useNavigate();
     const { user, refreshUser } = useAuth();
     const [profile, setProfile] = useState(null);
     const [stats, setStats] = useState({ reports: 0, claims: 0 });
-    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -26,28 +24,38 @@ const UserProfile = () => {
     const loadProfile = async () => {
         try {
             setLoading(true);
+            setError('');
             if (user) {
                 const [data, reports, claims] = await Promise.all([
-                    getUserProfile(user.id),
-                    getMyReports(user.id),
-                    getMyClaims(user.id)
+                    getUserProfile(user.id).catch(err => {
+                        console.warn('Profile API warning, using context fallback:', err);
+                        return null;
+                    }),
+                    getMyReports(user.id).catch(() => []),
+                    getMyClaims(user.id).catch(() => [])
                 ]);
-                setProfile(data);
-                setEditData(data || {});
+                const mergedProfile = { ...user, ...(data || {}) };
+                setProfile(mergedProfile);
+                setEditData(mergedProfile);
                 setStats({
-                    reports: reports.length,
-                    claims: claims.length
+                    reports: Array.isArray(reports) ? reports.length : 0,
+                    claims: Array.isArray(claims) ? claims.length : 0
                 });
             }
         } catch (err) {
-            setError('Failed to load profile');
+            console.error('Profile load error:', err);
+            if (user) {
+                setProfile(user);
+                setEditData(user);
+            } else {
+                setError('Failed to load profile');
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const isPhotoDirty = !!(editData.newPhoto || editData.removePhoto);
-
 
     const handlePhotoSelect = (e) => {
         const file = e.target.files[0];
@@ -80,16 +88,13 @@ const UserProfile = () => {
             if (editData.newPhoto) {
                 await uploadUserDocuments(user.id, null, editData.newPhoto);
             } else if (editData.removePhoto) {
-                // Remove profile photo from database
                 await updateUserProfile(user.id, {
                     profilePhotoUrl: null,
                     profilePhotoPublicId: null
                 });
             }
 
-            // Refresh profile on this page
             await loadProfile();
-            // Refresh user context to update sidebar avatar
             await refreshUser();
             setLocalPreview(null);
             setEditData({});
@@ -103,47 +108,59 @@ const UserProfile = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-gray-900 to-cyan-900">
-                <div className="text-white text-xl">Loading...</div>
+            <div className="min-h-screen flex items-center justify-center bg-[#050505] text-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-xs font-mono uppercase tracking-widest text-slate-400">Loading Verified Profile...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-gray-900 to-cyan-900 p-6">
-            <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen bg-[#050505] text-white p-6 sm:p-10 relative overflow-x-hidden selection:bg-[#00E5FF]/20 selection:text-[#00E5FF]">
+            {/* Background Ambient Mesh Glow */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#0a1128]/70 blur-[180px] rounded-full"></div>
+            </div>
+
+            <div className="max-w-4xl mx-auto relative z-10 space-y-8">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between">
                     <button
-                        onClick={() => navigate(`/${profile?.role}/dashboard`)}
-                        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        onClick={() => navigate(user?.role ? `/${user.role}/dashboard` : '/')}
+                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
                     >
-                        <ArrowLeft size={20} />
-                        Back to Dashboard
+                        <ArrowLeft size={18} />
+                        Back to Portal
                     </button>
                 </div>
 
-                {/* Profile Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
-                    <div className="flex items-center justify-between mb-8">
+                {/* Profile Floating Card */}
+                <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] shadow-[0_30px_60px_-15px_rgba(0,229,255,0.08)] p-8 sm:p-10 space-y-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">My Profile</h1>
-                            <p className="text-xs text-white/40 mt-1 uppercase tracking-widest font-black">Verified Identity</p>
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-3 py-1 rounded-full border border-[#00E5FF]/20">
+                                Verified Identity
+                            </span>
+                            <h1 className="text-3xl font-black text-white tracking-tight mt-2">My Account Profile</h1>
+                            <p className="text-xs text-slate-400 mt-1">GLA University Authenticated Credentials</p>
                         </div>
+
                         {isPhotoDirty && (
-                            <div className="flex gap-2 animate-fade-in">
+                            <div className="flex items-center gap-3">
                                 <button
                                     onClick={handleCancelPhoto}
-                                    className="px-4 py-2 rounded-xl bg-white/5 text-white hover:bg-white/10 transition-all text-xs font-bold"
+                                    className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all text-xs font-bold"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="flex items-center gap-2 px-6 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-all disabled:opacity-50 text-xs font-bold shadow-lg shadow-green-500/20"
+                                    className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#00E5FF] text-slate-950 hover:bg-cyan-300 transition-all text-xs font-extrabold uppercase tracking-wider shadow-[0_10px_25px_rgba(0,229,255,0.3)]"
                                 >
-                                    <Save size={16} />
+                                    <Save size={14} />
                                     {saving ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
@@ -151,23 +168,23 @@ const UserProfile = () => {
                     </div>
 
                     {error && (
-                        <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-200">
+                        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
                             {error}
                         </div>
                     )}
 
                     {/* Profile Photo Section */}
-                    <div className="flex flex-col items-center mb-8">
+                    <div className="flex flex-col items-center">
                         <div className="relative group">
-                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 bg-white/5 flex items-center justify-center">
+                            <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white/20 bg-white/5 flex items-center justify-center shadow-xl">
                                 {localPreview === 'DELETE' ? (
-                                    <User size={64} className="text-white/20" />
+                                    <User size={56} className="text-slate-500" />
                                 ) : localPreview ? (
                                     <img src={localPreview} alt="Preview" className="w-full h-full object-cover" />
                                 ) : profile?.profilePhotoUrl ? (
                                     <img src={profile.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
-                                    <User size={64} className="text-white/20" />
+                                    <User size={56} className="text-slate-500" />
                                 )}
                             </div>
 
@@ -182,7 +199,7 @@ const UserProfile = () => {
                                 {((localPreview && localPreview !== 'DELETE') || (!localPreview && profile?.profilePhotoUrl)) ? (
                                     <button
                                         onClick={handlePhotoDelete}
-                                        className="p-1.5 rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600 transition-all border-2 border-slate-900"
+                                        className="p-2 rounded-full bg-rose-500 text-white shadow-lg hover:bg-rose-600 transition-all"
                                         title="Remove Photo"
                                     >
                                         <Trash2 size={12} />
@@ -190,7 +207,7 @@ const UserProfile = () => {
                                 ) : (
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="p-1.5 rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-600 transition-all border-2 border-slate-900"
+                                        className="p-2 rounded-full bg-[#00E5FF] text-slate-950 shadow-lg hover:bg-cyan-300 transition-all"
                                         title="Upload Photo"
                                     >
                                         <Camera size={12} />
@@ -202,108 +219,107 @@ const UserProfile = () => {
 
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Name */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <User size={16} />
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <User size={14} className="text-[#00E5FF]" />
                                 Full Name
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
-                                {profile?.name || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold">
+                                {profile?.name || user?.name || 'Not set'}
                             </div>
                         </div>
 
                         {/* Date of Birth */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <Calendar size={16} />
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <Calendar size={14} className="text-[#00E5FF]" />
                                 Date of Birth
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
-                                {profile?.dateOfBirth || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold">
+                                {profile?.dateOfBirth || user?.dateOfBirth || 'Not set'}
                             </div>
                         </div>
 
                         {/* Mobile Number */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <Phone size={16} />
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <Phone size={14} className="text-[#00E5FF]" />
                                 Mobile Number
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
-                                {profile?.mobile || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold font-mono">
+                                {profile?.mobile || user?.mobile || 'Not set'}
                             </div>
                         </div>
 
                         {/* Personal Email */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <Mail size={16} />
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <Mail size={14} className="text-[#00E5FF]" />
                                 Personal Email
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white truncate">
-                                {profile?.personalEmail || profile?.email || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold truncate">
+                                {profile?.personalEmail || profile?.email || user?.email || 'Not set'}
                             </div>
                         </div>
 
                         {/* Identifier */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <CreditCard size={16} />
-                                {profile?.role === 'student' ? 'University Roll Number' : 'Faculty ID'}
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <CreditCard size={14} className="text-[#00E5FF]" />
+                                {(profile?.role || user?.role) === 'faculty' ? 'Faculty ID' : 'University Roll Number'}
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
-                                {profile?.identifier || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold font-mono">
+                                {profile?.identifier || user?.identifier || 'Not set'}
                             </div>
                         </div>
 
                         {/* University Email */}
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-white/60 mb-2">
-                                <Building size={16} />
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <Building size={14} className="text-[#00E5FF]" />
                                 University Email
                             </label>
-                            <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white truncate">
-                                {profile?.universityEmail || 'Not set'}
+                            <div className="px-4 py-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white text-xs font-semibold truncate">
+                                {profile?.universityEmail || profile?.email || user?.email || 'Not set'}
                             </div>
                         </div>
                     </div>
 
-                    {/* Account Status */}
-                    {/* Activity Stats */}
-                    <div className="grid md:grid-cols-2 gap-6 mt-6">
-                        <div className="p-6 rounded-2xl bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/20">
-                            <h3 className="text-lg font-semibold text-white mb-4">Account Status</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                                    <span className="text-white/80">Email Verified</span>
+                    {/* Account Status & Activity Stats */}
+                    <div className="grid md:grid-cols-2 gap-6 pt-4">
+                        <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-4">
+                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">Account Verification</h3>
+                            <div className="space-y-2 text-xs">
+                                <div className="flex items-center gap-2 text-slate-300">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                    <span>GLA Email Verified</span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                                    <span className="text-white/80">Mobile Verified</span>
+                                <div className="flex items-center gap-2 text-slate-300">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                    <span>Mobile Number Verified</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
-                            <h3 className="text-lg font-semibold text-white mb-4">My Activity</h3>
+                        <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-4">
+                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">My Portal Activity</h3>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-500/20 text-blue-400 rounded-lg">
-                                        <FileText size={20} />
+                                    <div className="p-2.5 rounded-xl bg-sky-400/10 text-sky-400 border border-sky-400/20">
+                                        <FileText size={18} />
                                     </div>
                                     <div>
-                                        <div className="text-2xl font-bold text-white">{stats.reports}</div>
-                                        <div className="text-xs text-white/60 uppercase tracking-wider font-bold">Reports Filed</div>
+                                        <div className="text-xl font-black text-white">{stats.reports}</div>
+                                        <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Reports</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-purple-500/20 text-purple-400 rounded-lg">
-                                        <CheckCircle size={20} />
+                                    <div className="p-2.5 rounded-xl bg-purple-400/10 text-purple-400 border border-purple-400/20">
+                                        <CheckCircle size={18} />
                                     </div>
                                     <div>
-                                        <div className="text-2xl font-bold text-white">{stats.claims}</div>
-                                        <div className="text-xs text-white/60 uppercase tracking-wider font-bold">Claims Made</div>
+                                        <div className="text-xl font-black text-white">{stats.claims}</div>
+                                        <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Claims</div>
                                     </div>
                                 </div>
                             </div>

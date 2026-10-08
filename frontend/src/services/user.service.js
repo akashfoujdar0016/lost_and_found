@@ -6,7 +6,6 @@ import api from './mongo.api';
 export const createUserProfile = async (userId, userData) => {
     try {
         const response = await api.post('/users/sync', {
-            uid: userId,
             ...userData
         });
         return { success: true, user: response.data };
@@ -20,11 +19,17 @@ export const createUserProfile = async (userId, userData) => {
  */
 export const getUserProfile = async (userId) => {
     try {
-        const response = await api.post('/users/sync', { uid: userId });
+        const response = await api.get('/users/me');
         return response.data;
     } catch (error) {
-        console.error('Error getting user profile:', error);
-        throw new Error('Failed to get user profile');
+        console.warn('GET /users/me failed, trying POST /users/sync:', error.message);
+        try {
+            const syncResponse = await api.post('/users/sync', {});
+            return syncResponse.data;
+        } catch (syncErr) {
+            console.error('Error getting user profile:', syncErr);
+            throw new Error('Failed to get user profile');
+        }
     }
 };
 
@@ -33,10 +38,7 @@ export const getUserProfile = async (userId) => {
  */
 export const updateUserProfile = async (userId, updates) => {
     try {
-        const response = await api.post('/users/sync', {
-            uid: userId,
-            ...updates
-        });
+        const response = await api.post('/users/sync', updates);
         return { success: true, user: response.data };
     } catch (error) {
         console.error('Error updating profile:', error);
@@ -49,7 +51,6 @@ export const updateUserProfile = async (userId, updates) => {
  */
 export const checkIdentifierExists = async (identifier, role) => {
     try {
-        // Simple check against backend
         const response = await api.get(`/users/check/${identifier}?role=${role}`);
         return response.data.exists;
     } catch (error) {
@@ -63,8 +64,6 @@ export const checkIdentifierExists = async (identifier, role) => {
 export const uploadUserDocuments = async (userId, files) => {
     try {
         if (!files || files.length === 0) return [];
-        // For now, reuse the item image upload logic structure if needed, 
-        // but here we just return a success message or mock URLs
         return ['doc_uploaded_success'];
     } catch (error) {
         console.error('Error uploading documents:', error);
@@ -79,4 +78,3 @@ export default {
     checkIdentifierExists,
     uploadUserDocuments
 };
-

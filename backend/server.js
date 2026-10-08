@@ -382,6 +382,16 @@ app.post(['/api/auth/login', '/auth/login', '/login'], checkDbConnection, async 
 });
 
 // User Management Routes
+app.get(['/api/users/me', '/users/me', '/api/users/profile', '/users/profile'], checkDbConnection, verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ error: 'User profile not found' });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get(['/api/users/check/:identifier', '/users/check/:identifier'], async (req, res) => {
     try {
         const { identifier } = req.params;
@@ -393,18 +403,19 @@ app.get(['/api/users/check/:identifier', '/users/check/:identifier'], async (req
     }
 });
 
-app.post(['/api/users/sync', '/users/sync'], verifyToken, async (req, res) => {
+app.post(['/api/users/sync', '/users/sync'], checkDbConnection, verifyToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const { ...userData } = req.body;
+        const { uid, _id, password, ...userData } = req.body;
 
         let user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         
-        // Update fields that are provided
-        Object.keys(userData).forEach(key => {
+        // Update valid fields that are provided
+        const allowedFields = ['name', 'mobile', 'dateOfBirth', 'profilePhotoUrl', 'universityEmail', 'personalEmail', 'identifier', 'emailVerified', 'mobileVerified'];
+        allowedFields.forEach(key => {
             if (userData[key] !== undefined) {
                 user[key] = userData[key];
             }
@@ -414,6 +425,7 @@ app.post(['/api/users/sync', '/users/sync'], verifyToken, async (req, res) => {
         
         res.json(user);
     } catch (error) {
+        console.error('Error syncing user profile:', error);
         res.status(500).json({ error: error.message });
     }
 });
