@@ -44,11 +44,11 @@ const Landing = () => {
             try {
                 const items = await getItems({ limit: 3 });
                 const activityData = items.map(item => ({
-                    id: item.id,
+                    id: item.id || item._id,
                     emoji: getEmojiForCategory(item.category),
                     title: item.title,
                     status: item.type === 'lost' ? 'Lost' : 'Found',
-                    statusColor: item.type === 'lost' ? 'text-rose-400 border-rose-500/20 bg-rose-500/10' : 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10',
+                    statusColor: item.type === 'lost' ? 'text-rose-400 border-rose-500/20 bg-rose-500/10' : 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10',
                     location: item.location,
                     timestamp: item.createdAt
                 }));
@@ -61,8 +61,12 @@ const Landing = () => {
         fetchLatestActivity();
     }, []);
 
-    const handleGetStarted = () => {
+    const handleLogin = () => {
         navigate('/login');
+    };
+
+    const handleRegister = () => {
+        navigate('/register');
     };
 
     const scrollToSection = (sectionId) => {
@@ -78,35 +82,33 @@ const Landing = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#000000] text-slate-100 bg-grid-pattern relative overflow-x-hidden">
-            {/* Header / Navigation Bar */}
-            <header className="fixed top-0 left-0 right-0 z-50 bg-[#000000]/85 backdrop-blur-2xl border-b border-white/[0.07]">
-                <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#111318] border border-white/10 flex items-center justify-center font-bold text-sky-400 shadow-[0_10px_25px_rgba(0,0,0,0.8)] font-mono">
-                            A&amp;L
-                        </div>
-                        <div>
-                            <h1 className="text-sm font-bold text-white tracking-wide">GLA UNIVERSITY</h1>
-                            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-semibold">Anti-Gravity Campus Ecosystem</p>
-                        </div>
+        <div className="min-h-screen bg-[#050505] text-slate-100 bg-grid-pattern relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+            {/* Ambient Radial Background Glow */}
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-500/[0.07] blur-[140px] rounded-full pointer-events-none z-0"></div>
+
+            {/* Header / Anti-Gravity Navbar */}
+            <header className="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+                <nav className="mx-auto max-w-7xl px-8 py-4 flex items-center justify-between bg-[#0c0f16]/70 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+                        <div className="w-3 h-3 rounded-sm bg-cyan-400 shadow-[0_0_12px_rgba(0,229,255,0.8)]"></div>
+                        <h1 className="text-sm font-black tracking-widest text-white uppercase font-sans">GLA UNIVERSITY</h1>
                     </div>
 
                     <div className="hidden md:flex items-center gap-8">
-                        <button onClick={() => scrollToSection('about')} className="text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
-                            Architecture
+                        <button onClick={handleRegister} className="text-xs font-semibold text-slate-400 hover:text-white transition-colors uppercase tracking-wider">
+                            Report Item
                         </button>
-                        <button onClick={() => scrollToSection('features')} className="text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
-                            Telemetry
+                        <button onClick={handleLogin} className="text-xs font-semibold text-slate-400 hover:text-white transition-colors uppercase tracking-wider">
+                            Browse Found
                         </button>
-                        <button onClick={() => scrollToSection('how-it-works')} className="text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
-                            Protocol
+                        <button onClick={() => scrollToSection('guidelines')} className="text-xs font-semibold text-slate-400 hover:text-white transition-colors uppercase tracking-wider">
+                            Guidelines
                         </button>
                         <button
-                            onClick={handleGetStarted}
-                            className="px-5 py-2.5 rounded-xl bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider hover:bg-sky-300 transition-all shadow-[0_10px_30px_rgba(56,189,248,0.25)] active:scale-95"
+                            onClick={handleLogin}
+                            className="px-6 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-white font-bold text-xs uppercase tracking-wider hover:bg-white/10 hover:border-white/20 transition-all shadow-[0_10px_25px_rgba(0,0,0,0.5)] active:scale-95 backdrop-blur-md"
                         >
-                            Portal Launch
+                            Student Login
                         </button>
                     </div>
 
@@ -124,210 +126,149 @@ const Landing = () => {
                     </button>
                 </nav>
 
-                {/* Mobile Menu */}
+                {/* Mobile Menu Dropdown */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden bg-[#0a0c0f] border-b border-white/10 py-4 px-6 space-y-3">
-                        <button onClick={() => { scrollToSection('about'); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
-                            Architecture
+                    <div className="md:hidden mt-3 bg-[#0c0f16]/95 border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl backdrop-blur-2xl">
+                        <button onClick={() => { handleRegister(); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
+                            Report Item
                         </button>
-                        <button onClick={() => { scrollToSection('features'); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
-                            Telemetry
+                        <button onClick={() => { handleLogin(); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
+                            Browse Found
                         </button>
-                        <button onClick={() => { scrollToSection('how-it-works'); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
-                            Protocol
+                        <button onClick={() => { scrollToSection('guidelines'); setIsMobileMenuOpen(false); }} className="block w-full text-left text-xs uppercase tracking-wider text-slate-300 py-2">
+                            Guidelines
                         </button>
-                        <button onClick={() => { handleGetStarted(); setIsMobileMenuOpen(false); }} className="w-full py-3 rounded-xl bg-sky-400 text-slate-950 font-bold text-xs uppercase tracking-wider text-center">
-                            Portal Launch
+                        <button onClick={() => { handleLogin(); setIsMobileMenuOpen(false); }} className="w-full py-3 rounded-xl bg-cyan-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider text-center">
+                            Student Login
                         </button>
                     </div>
                 )}
             </header>
 
-            <main className="relative z-10 pt-28">
+            {/* Main Anti-Gravity Workspace */}
+            <main className="relative z-10 pt-32">
                 {/* Hero Section */}
-                <section className="mx-auto max-w-7xl px-6 py-20 min-h-[85vh] flex items-center grid lg:grid-cols-12 gap-12">
-                    <div className="lg:col-span-7 space-y-8">
-                        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-md bg-white/[0.04] border border-white/10 text-slate-300 text-[11px] font-mono tracking-wider uppercase">
-                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                            Aetherium Spatial Engine • v2.4 Active
-                        </div>
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.08] text-white tracking-tight">
-                            Anti-Gravity <span className="text-sky-400">Campus</span> Spatial IDE.
-                        </h1>
-                        <p className="text-slate-400 text-base md:text-lg max-w-2xl font-normal leading-relaxed">
-                            A weightless, spatial-first recovery workspace for GLA University. Float through active lost item clusters, inspect dependency paths, and execute faculty-audited claims with aerospace precision.
-                        </p>
-
-                        <div className="flex flex-wrap gap-4 pt-2">
-                            <button
-                                onClick={handleGetStarted}
-                                className="px-8 py-4 rounded-xl bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-widest hover:bg-sky-300 transition-all shadow-[0_20px_45px_rgba(56,189,248,0.25)] hover:shadow-[0_25px_55px_rgba(56,189,248,0.35)] active:scale-95"
-                            >
-                                Launch Workspace
-                            </button>
-                            <button
-                                onClick={() => scrollToSection('features')}
-                                className="px-8 py-4 rounded-xl bg-white/[0.04] border border-white/10 text-white font-bold text-xs uppercase tracking-widest hover:bg-white/[0.08] hover:border-white/20 transition-all"
-                            >
-                                System Architecture
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/[0.07] font-mono">
-                            <div>
-                                <p className="text-2xl font-extrabold text-amber-400">100%</p>
-                                <p className="text-[11px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Faculty Audited</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-extrabold text-sky-400">&lt; 12h</p>
-                                <p className="text-[11px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Spatial Match</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-extrabold text-emerald-400">256-Bit</p>
-                                <p className="text-[11px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">JWT Encrypted</p>
-                            </div>
-                        </div>
+                <section className="mx-auto max-w-7xl px-6 py-20 min-h-[80vh] flex flex-col items-center justify-center text-center">
+                    {/* Anti-Gravity Badge */}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-8 backdrop-blur-md animate-pulse">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,229,255,1)]"></span>
+                        Official Campus Network
                     </div>
 
-                    {/* Anti-Gravity Levitating 3D Cards */}
-                    <div className="lg:col-span-5 relative">
-                        <div className="relative z-20 rounded-2xl bg-[#111318]/90 border border-white/10 p-6 shadow-[0_35px_80px_rgba(0,0,0,0.95)] backdrop-blur-xl transform hover:-translate-y-2 transition-all duration-500">
-                            <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.07]">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
-                                    <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                                    <div className="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
-                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest ml-2 font-mono">Telemetry Radar</span>
+                    {/* Main Headline */}
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.08] text-white tracking-tight max-w-4xl mb-6">
+                        Campus <span className="text-cyan-400 drop-shadow-[0_0_35px_rgba(0,229,255,0.4)]">Lost &amp; Found.</span>
+                    </h1>
+
+                    {/* Hero Subheadline */}
+                    <p className="text-slate-400 text-base md:text-lg max-w-2xl font-normal leading-relaxed mb-10">
+                        A fast, secure, and effortless way to recover your misplaced items. Float a request to the campus network, or help a fellow student by reporting a found item.
+                    </p>
+
+                    {/* Hero Buttons */}
+                    <div className="flex flex-wrap gap-5 justify-center mb-16">
+                        <button
+                            onClick={handleRegister}
+                            className="px-9 py-4 rounded-xl bg-cyan-400 text-slate-950 font-extrabold text-xs uppercase tracking-widest hover:bg-cyan-300 transition-all shadow-[0_12px_35px_rgba(0,229,255,0.35)] hover:shadow-[0_20px_45px_rgba(0,229,255,0.45)] active:scale-95"
+                        >
+                            Report Lost Item
+                        </button>
+                        <button
+                            onClick={handleLogin}
+                            className="px-9 py-4 rounded-xl bg-[#11141b]/80 border border-white/15 text-white font-bold text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/30 transition-all backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] active:scale-95"
+                        >
+                            Search Database
+                        </button>
+                    </div>
+                </section>
+
+                {/* Anti-Gravity Live Activity Telemetry Card */}
+                {latestActivity.length > 0 && (
+                    <section className="mx-auto max-w-4xl px-6 mb-20">
+                        <div className="rounded-3xl bg-[#0e1118]/80 border border-white/[0.08] p-6 md:p-8 shadow-[0_30px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all hover:border-cyan-400/30">
+                            <div className="flex items-center justify-between pb-4 mb-5 border-b border-white/[0.07]">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></div>
+                                    <span className="text-xs font-bold text-slate-300 uppercase tracking-widest font-mono">Live Activity Stream</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20 uppercase tracking-widest font-mono">Node Active</span>
+                                <span className="text-[10px] font-extrabold text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded border border-cyan-400/20 uppercase tracking-widest font-mono">Real-Time Sync</span>
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="grid md:grid-cols-3 gap-4">
                                 {latestActivity.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="flex items-center gap-4 p-3.5 rounded-xl bg-[#161922] border border-white/[0.06] hover:border-sky-400/30 transition-all shadow-md group"
+                                        onClick={handleLogin}
+                                        className="p-4 rounded-2xl bg-[#151923] border border-white/[0.06] hover:border-cyan-400/40 transition-all shadow-lg hover:-translate-y-1 cursor-pointer group"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-[#1c202b] border border-white/10 flex items-center justify-center text-lg shrink-0">
-                                            {item.emoji}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors font-mono">{item.title}</h4>
-                                            <p className="text-[11px] text-slate-400 truncate mt-0.5">{item.location || 'GLA Campus Zone'}</p>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${item.statusColor} font-mono`}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className="text-2xl">{item.emoji}</span>
+                                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${item.statusColor} font-mono uppercase`}>
                                                 {item.status}
                                             </span>
-                                            <p className="text-[10px] text-slate-500 mt-1 font-mono">{getRelativeTime(item.timestamp)}</p>
                                         </div>
+                                        <h4 className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">{item.title}</h4>
+                                        <p className="text-[11px] text-slate-400 truncate mt-1">{item.location || 'GLA Campus Zone'}</p>
+                                        <p className="text-[10px] text-slate-500 mt-2 font-mono text-right">{getRelativeTime(item.timestamp)}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
+                    </section>
+                )}
 
-                        {/* Overlapping Spatial Depth Card */}
-                        <div className="absolute -bottom-6 -right-6 w-full h-full rounded-2xl bg-[#07080a]/90 border border-white/[0.05] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-md z-10 pointer-events-none transform translate-x-4 translate-y-4"></div>
-                    </div>
-                </section>
-
-                {/* About Section */}
-                <section id="about" className="mx-auto max-w-7xl px-6 py-20">
-                    <div className="rounded-3xl bg-[#111318]/90 border border-white/[0.07] p-10 md:p-12 shadow-[0_35px_80px_rgba(0,0,0,0.9)] backdrop-blur-xl">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-6">
-                                <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded border border-amber-400/20 font-mono">Aerospace Architecture</span>
-                                <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
-                                    Spatial Precision for Campus Recovery
-                                </h2>
-                                <p className="text-slate-400 text-sm md:text-base leading-relaxed">
-                                    GLA Lost & Found standardizes how personal belongings are logged, authenticated, and reclaimed across university grounds. Every claim passes through encrypted verification protocols supervised by administrative faculty.
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 font-mono">
-                                <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06] hover:border-sky-400/30 transition-all">
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">01. Spatial Catalog</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Categorical taxonomy with precise location telemetry.</p>
-                                </div>
-                                <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06] hover:border-amber-400/30 transition-all">
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">02. Ownership Audit</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Multi-factor claim verification directly by faculty.</p>
-                                </div>
-                                <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06] hover:border-emerald-400/30 transition-all">
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">03. Node Correlation</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Algorithmic correlation between lost &amp; found items.</p>
-                                </div>
-                                <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06] hover:border-sky-400/30 transition-all">
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">04. Audit Log</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Transparent status tracking from log to handover.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Features Section */}
-                <section id="features" className="mx-auto max-w-7xl px-6 py-20">
-                    <div className="text-center mb-16 space-y-3">
-                        <span className="text-[11px] font-extrabold uppercase tracking-widest text-sky-400 bg-sky-400/10 px-3 py-1 rounded border border-sky-400/20 font-mono">System Capabilities</span>
-                        <h3 className="text-3xl md:text-5xl font-black text-white">Spatial Telemetry</h3>
-                        <p className="text-slate-400 text-sm max-w-xl mx-auto">Engineered for speed, clarity, and security across desktop and mobile clients.</p>
-                    </div>
-
+                {/* Bottom Stats Row (3 Columns) */}
+                <section className="mx-auto max-w-7xl px-6 mb-24">
                     <div className="grid md:grid-cols-3 gap-8">
-                        <div className="rounded-2xl bg-[#111318]/90 border border-white/[0.07] p-8 shadow-[0_30px_70px_rgba(0,0,0,0.85)] backdrop-blur-xl hover:-translate-y-2 transition-all duration-300">
-                            <div className="w-12 h-12 rounded-xl bg-sky-400/10 border border-sky-400/20 flex items-center justify-center text-sky-400 mb-6 font-bold text-xl font-mono">
-                                01
-                            </div>
-                            <h4 className="text-lg font-bold text-white mb-3">Structured Index Search</h4>
-                            <p className="text-slate-400 text-xs leading-relaxed">Instant indexing across categories, timestamps, locations, and status states for high precision item lookup.</p>
+                        {/* Column 1 */}
+                        <div className="rounded-3xl bg-[#0e1118]/80 border border-white/[0.08] p-9 shadow-[0_25px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl hover:border-cyan-400/30 hover:-translate-y-1.5 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none"></div>
+                            <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">100% Campus Verified</h3>
+                            <p className="text-xs text-slate-400 font-medium">Monitored by GLA Administration</p>
                         </div>
 
-                        <div className="rounded-2xl bg-[#111318]/90 border border-white/[0.07] p-8 shadow-[0_30px_70px_rgba(0,0,0,0.85)] backdrop-blur-xl hover:-translate-y-2 transition-all duration-300">
-                            <div className="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 mb-6 font-bold text-xl font-mono">
-                                02
-                            </div>
-                            <h4 className="text-lg font-bold text-white mb-3">Faculty Review Queue</h4>
-                            <p className="text-slate-400 text-xs leading-relaxed">Dedicated administrative review queues ensuring claims are validated prior to item handover.</p>
+                        {/* Column 2 */}
+                        <div className="rounded-3xl bg-[#0e1118]/80 border border-white/[0.08] p-9 shadow-[0_25px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl hover:border-cyan-400/30 hover:-translate-y-1.5 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none"></div>
+                            <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">&lt; 24h Average Match</h3>
+                            <p className="text-xs text-slate-400 font-medium">Fast recovery notifications</p>
                         </div>
 
-                        <div className="rounded-2xl bg-[#111318]/90 border border-white/[0.07] p-8 shadow-[0_30px_70px_rgba(0,0,0,0.85)] backdrop-blur-xl hover:-translate-y-2 transition-all duration-300">
-                            <div className="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center text-emerald-400 mb-6 font-bold text-xl font-mono">
-                                03
-                            </div>
-                            <h4 className="text-lg font-bold text-white mb-3">Cloud Media Pipeline</h4>
-                            <p className="text-slate-400 text-xs leading-relaxed">Direct image upload pipelines allowing visual proof submission for items and verification documents.</p>
+                        {/* Column 3 */}
+                        <div className="rounded-3xl bg-[#0e1118]/80 border border-white/[0.08] p-9 shadow-[0_25px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl hover:border-cyan-400/30 hover:-translate-y-1.5 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl pointer-events-none"></div>
+                            <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">Secure &amp; Private</h3>
+                            <p className="text-xs text-slate-400 font-medium">Your student details stay hidden</p>
                         </div>
                     </div>
                 </section>
 
-                {/* Process Section */}
-                <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-20">
-                    <div className="rounded-3xl bg-[#111318]/90 border border-white/[0.07] p-10 md:p-12 shadow-[0_35px_80px_rgba(0,0,0,0.9)] backdrop-blur-xl text-center">
-                        <span className="text-[11px] font-extrabold uppercase tracking-widest text-sky-400 bg-sky-400/10 px-3 py-1 rounded border border-sky-400/20 font-mono">Operational Workflow</span>
+                {/* Guidelines Protocol Section */}
+                <section id="guidelines" className="mx-auto max-w-7xl px-6 pb-24">
+                    <div className="rounded-3xl bg-[#0e1118]/80 border border-white/[0.08] p-10 md:p-12 shadow-[0_35px_80px_rgba(0,0,0,0.9)] backdrop-blur-2xl text-center">
+                        <span className="text-[11px] font-extrabold uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded border border-cyan-400/20">Campus Guidelines</span>
                         <h3 className="text-3xl font-black text-white mt-4 mb-10">4-Step Recovery Protocol</h3>
 
-                        <div className="grid md:grid-cols-4 gap-6 text-left font-mono">
-                            <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06]">
-                                <span className="text-xs font-bold text-sky-400">PHASE 01</span>
-                                <h4 className="text-sm font-bold text-white mt-2 mb-2">Authentication</h4>
-                                <p className="text-slate-400 text-xs leading-relaxed font-sans">Sign in with university credentials (Student Roll No or Faculty ID).</p>
+                        <div className="grid md:grid-cols-4 gap-6 text-left">
+                            <div className="p-6 rounded-2xl bg-[#151923] border border-white/[0.06]">
+                                <span className="text-xs font-bold text-cyan-400 font-mono">PHASE 01</span>
+                                <h4 className="text-sm font-bold text-white mt-2 mb-1">Student Authentication</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">Sign in with your GLA Student Roll No or Faculty ID.</p>
                             </div>
-                            <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06]">
-                                <span className="text-xs font-bold text-amber-400">PHASE 02</span>
-                                <h4 className="text-sm font-bold text-white mt-2 mb-2">Item Log</h4>
-                                <p className="text-slate-400 text-xs leading-relaxed font-sans">Create a detailed report with category, location, and optional media proof.</p>
+                            <div className="p-6 rounded-2xl bg-[#151923] border border-white/[0.06]">
+                                <span className="text-xs font-bold text-cyan-400 font-mono">PHASE 02</span>
+                                <h4 className="text-sm font-bold text-white mt-2 mb-1">Item Log</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">Create a detailed report with category, location, and optional media proof.</p>
                             </div>
-                            <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06]">
-                                <span className="text-xs font-bold text-emerald-400">PHASE 03</span>
-                                <h4 className="text-sm font-bold text-white mt-2 mb-2">Faculty Audit</h4>
-                                <p className="text-slate-400 text-xs leading-relaxed font-sans">Faculty moderators verify item claims and validate ownership.</p>
+                            <div className="p-6 rounded-2xl bg-[#151923] border border-white/[0.06]">
+                                <span className="text-xs font-bold text-cyan-400 font-mono">PHASE 03</span>
+                                <h4 className="text-sm font-bold text-white mt-2 mb-1">Faculty Verification</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">Faculty moderators audit claims and confirm ownership.</p>
                             </div>
-                            <div className="p-6 rounded-2xl bg-[#161922] border border-white/[0.06]">
-                                <span className="text-xs font-bold text-sky-400">PHASE 04</span>
-                                <h4 className="text-sm font-bold text-white mt-2 mb-2">Handover</h4>
-                                <p className="text-slate-400 text-xs leading-relaxed font-sans">Collect approved items from the designated campus administrative desk.</p>
+                            <div className="p-6 rounded-2xl bg-[#151923] border border-white/[0.06]">
+                                <span className="text-xs font-bold text-cyan-400 font-mono">PHASE 04</span>
+                                <h4 className="text-sm font-bold text-white mt-2 mb-1">Safe Handover</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">Collect your item safely from the designated campus office desk.</p>
                             </div>
                         </div>
                     </div>
@@ -335,14 +276,14 @@ const Landing = () => {
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-white/[0.07] bg-[#000000] py-12 relative z-10 font-mono">
+            <footer className="border-t border-white/[0.07] bg-[#050505] py-12 relative z-10 font-sans">
                 <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500">
                     <div>
-                        <p className="text-white font-bold tracking-wider">GLA UNIVERSITY • AETHERIUM SPATIAL IDE PORTAL</p>
-                        <p className="mt-1 text-[11px] text-slate-400 font-sans">Anti-Gravity Telemetry Architecture</p>
+                        <p className="text-white font-bold tracking-wider">GLA UNIVERSITY • LOST &amp; FOUND NETWORK</p>
+                        <p className="mt-1 text-[11px] text-slate-400">Aetherium Anti-Gravity Spatial UX</p>
                     </div>
                     <div className="flex items-center gap-6 font-semibold uppercase tracking-wider">
-                        <button onClick={handleGetStarted} className="text-sky-400 hover:text-sky-300">Sign In</button>
+                        <button onClick={handleLogin} className="text-cyan-400 hover:text-cyan-300">Student Login</button>
                         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-slate-400 hover:text-white">Back to Top</button>
                     </div>
                 </div>

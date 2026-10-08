@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLA University - Campus Lost & Found</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE DESIGN SYSTEM & RESET --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-color: #050505;
+            --text-white: #ffffff;
+            --text-muted: #a1a1aa;
+            --accent-cyan: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.35);
+            --card-bg: rgba(17, 20, 27, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-hover: rgba(0, 229, 255, 0.3);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- FAINT DOT GRID BACKGROUND --- */
+        .bg-dot-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Ambient Glow Backdrop */
+        .ambient-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, rgba(5, 5, 5, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- LAYOUT WRAPPER --- */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* --- ANTI-GRAVITY FLOATING ANIMATION --- */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes float-delayed {
+            0%, 100% {
+                transform: translateY(-5px);
+            }
+            50% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .float-anim-delayed {
+            animation: float-delayed 6s ease-in-out infinite;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 32px;
+            margin-top: 24px;
+            background: rgba(12, 15, 22, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .navbar:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-white);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 36px;
+            list-style: none;
+        }
+
+        .nav-link a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link a:hover {
+            color: var(--text-white);
+        }
+
+        .btn-login {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 90px 0 60px 0;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: var(--accent-cyan);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            backdrop-filter: blur(12px);
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        .hero-headline {
+            font-size: clamp(42px, 7vw, 76px);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            color: var(--text-white);
+            max-width: 900px;
+            margin-bottom: 24px;
+        }
+
+        .hero-headline .cyan-accent {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
+        }
+
+        .hero-subheadline {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 680px;
+            margin-bottom: 44px;
+            font-weight: 400;
+        }
+
+        /* Hero Actions */
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: #050505;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            padding: 16px 36px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 30px var(--accent-glow), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 45px rgba(0, 229, 255, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            background: #26ecff;
+        }
+
+        .btn-secondary {
+            background: rgba(17, 20, 27, 0.6);
+            color: var(--text-white);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            padding: 16px 36px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            text-decoration: none;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(25, 30, 40, 0.8);
+            box-shadow: 0 22px 45px rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- STATS SECTION --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 36px 28px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-border-hover);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-white);
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .stat-card-glow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            padding: 32px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .footer-brand {
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-headline {
+                font-size: 42px;
+            }
+
+            .hero-subheadline {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Faint Dot Grid Pattern Background -->
+    <div class="bg-dot-grid"></div>
+
+    <!-- Soft Radial Glow Backdrop -->
+    <div class="ambient-glow"></div>
+
+    <!-- Main Spatial Application Container -->
+    <div class="app-container">
+
+        <!-- Top Floating Navigation -->
+        <nav class="navbar float-anim">
+            <a href="#" class="logo">
+                <span class="logo-icon"></span>
+                <span>GLA UNIVERSITY</span>
+            </a>
+
+            <ul class="nav-links">
+                <li class="nav-link"><a href="#report">Report Item</a></li>
+                <li class="nav-link"><a href="#browse">Browse Found</a></li>
+                <li class="nav-link"><a href="#guidelines">Guidelines</a></li>
+            </ul>
+
+            <a href="#login" class="btn-login">Student Login</a>
+        </nav>
+
+        <!-- Main Hero Section -->
+        <main class="hero">
+            <!-- Anti-Gravity Badge -->
+            <div class="badge float-anim-delayed">
+                <span class="badge-dot"></span>
+                <span>Official Campus Network</span>
+            </div>
+
+            <!-- Main Massive Headline -->
+            <h1 class="hero-headline float-anim">
+                Campus <span class="cyan-accent">Lost & Found.</span>
+            </h1>
+
+            <!-- Hero Subheadline -->
+            <p class="hero-subheadline float-anim-delayed">
+                A fast, secure, and effortless way to recover your misplaced items. Float a request to the campus network, or help a fellow student by reporting a found item.
+            </p>
+
+            <!-- Hero Call to Action Buttons -->
+            <div class="hero-buttons float-anim">
+                <a href="#report" class="btn-primary">Report Lost Item</a>
+                <a href="#browse" class="btn-secondary">Search Database</a>
+            </div>
+        </main>
+
+        <!-- Bottom Stats Row (3 Columns) -->
+        <section class="stats-grid">
+            <!-- Column 1 -->
+            <div class="stat-card float-anim">
+                <div class="stat-card-glow"></div>
+                <div class="stat-number">100% Campus Verified</div>
+                <div class="stat-subtext">Monitored by GLA Administration</div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="stat-card float-anim-delayed">
+                <div class="stat-card-glow"></div>
+                <div class="stat-number">&lt; 24h Average Match</div>
+                <div class="stat-subtext">Fast recovery notifications</div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="stat-card float-anim">
+                <div class="stat-card-glow"></div>
+                <div class="stat-number">Secure &amp; Private</div>
+                <div class="stat-subtext">Your student details stay hidden</div>
+            </div>
+        </section>
+
+        <!-- Minimal Footer -->
+        <footer class="footer">
+            <div class="footer-brand">&copy; GLA University Lost & Found</div>
+            <div>Aetherium Anti-Gravity Spatial UX</div>
+        </footer>
+
+    </div>
+
+    <!-- Minimal Interactive JavaScript -->
+    <script>
+        // Smooth parallax interactive effect on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const moveX = (clientX - window.innerWidth / 2) * 0.01;
+            const moveY = (clientY - window.innerHeight / 2) * 0.01;
+
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                const factor = (index + 1) * 0.5;
+                card.style.transform = `translate3d(${moveX * factor}px, ${moveY * factor}px, 0)`;
+            });
+        });
+    </script>
+</body>
+</html>
