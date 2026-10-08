@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLA University - Campus Lost & Found</title>
+    <title>GLA Lost & Found - Bespoke Agency Experience</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE DESIGN SYSTEM & RESET --- */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -17,52 +16,81 @@
         }
 
         :root {
-            --bg-color: #050505;
+            --bg-charcoal: #09090b;
             --text-white: #ffffff;
             --text-muted: #a1a1aa;
-            --accent-cyan: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.35);
-            --card-bg: rgba(17, 20, 27, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --card-border-hover: rgba(0, 229, 255, 0.3);
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --accent-cyan: #00E5FF;
+            --font-family: 'Inter', -apple-system, sans-serif;
         }
 
         html, body {
             width: 100%;
             height: 100%;
-            background-color: var(--bg-color);
+            background-color: var(--bg-charcoal);
             color: var(--text-white);
             font-family: var(--font-family);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- FAINT DOT GRID BACKGROUND --- */
-        .bg-dot-grid {
+        /* Full-Screen Film Grain Overlay */
+        .film-grain {
             position: fixed;
             inset: 0;
-            z-index: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-            background-size: 28px 28px;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
-            opacity: 0.7;
+            z-index: 999;
+            mix-blend-mode: overlay;
+            opacity: 0.15;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Ambient Glow Backdrop */
+        /* Deep Ambient Glow */
         .ambient-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            top: 15%;
+            position: fixed;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, rgba(5, 5, 5, 0) 70%);
+            transform: translate(-50%, -50%);
+            width: min(900px, 100vw);
+            height: min(900px, 100vw);
+            background: radial-gradient(circle, rgba(10, 17, 40, 0.7) 0%, transparent 70%);
+            filter: blur(180px);
             pointer-events: none;
             z-index: 0;
         }
 
-        /* --- LAYOUT WRAPPER --- */
+        /* Refractive True Glassmorphism */
+        .true-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 30px 60px -15px rgba(0, 0, 0, 0.8);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Drifting Physics Keyframes */
+        @keyframes float-slow-6 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(0.4deg); }
+        }
+
+        @keyframes float-slow-8 {
+            0%, 100% { transform: translateY(-6px) rotate(-0.4deg); }
+            50% { transform: translateY(6px) rotate(0.4deg); }
+        }
+
+        @keyframes float-slow-12 {
+            0%, 100% { transform: translateY(0px) rotate(0.2deg); }
+            50% { transform: translateY(-12px) rotate(-0.2deg); }
+        }
+
+        .drift-6 { animation: float-slow-6 6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .drift-8 { animation: float-slow-8 8s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+        .drift-12 { animation: float-slow-12 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+
+        /* Container & Layout */
         .app-container {
             position: relative;
             z-index: 1;
@@ -72,54 +100,30 @@
             justify-content: space-between;
             max-width: 1280px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
         }
 
-        /* --- ANTI-GRAVITY FLOATING ANIMATION --- */
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
+        /* Top Minimal Floating Navbar */
+        .nav-wrapper {
+            position: fixed;
+            top: 24px;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            padding: 0 16px;
         }
 
-        @keyframes float-delayed {
-            0%, 100% {
-                transform: translateY(-5px);
-            }
-            50% {
-                transform: translateY(0px);
-            }
-        }
-
-        .float-anim {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .float-anim-delayed {
-            animation: float-delayed 6s ease-in-out infinite;
-        }
-
-        /* --- NAVBAR --- */
         .navbar {
+            padding: 14px 32px;
+            border-radius: 100px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 32px;
-            margin-top: 24px;
-            background: rgba(12, 15, 22, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
-        }
-
-        .navbar:hover {
-            border-color: rgba(255, 255, 255, 0.15);
+            gap: 40px;
+            max-width: 640px;
+            width: 100%;
         }
 
         .logo {
@@ -127,367 +131,213 @@
             align-items: center;
             gap: 10px;
             font-weight: 900;
-            font-size: 15px;
-            letter-spacing: 0.15em;
+            font-size: 13px;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
             color: var(--text-white);
             text-decoration: none;
         }
 
-        .logo-icon {
-            width: 10px;
-            height: 10px;
+        .logo-dot {
+            width: 8px;
+            height: 8px;
             background-color: var(--accent-cyan);
-            border-radius: 2px;
-            box-shadow: 0 0 12px var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
         }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 36px;
-            list-style: none;
-        }
-
-        .nav-link a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .nav-link a:hover {
+        .btn-access {
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-white);
-        }
-
-        .btn-login {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-white);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 10px 22px;
-            border-radius: 12px;
-            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        .btn-login:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        .btn-access:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        /* --- HERO SECTION --- */
+        /* Hero Section */
         .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 90px 0 60px 0;
-            position: relative;
+            padding: 180px 0 100px 0;
+            max-width: 900px;
         }
 
         .badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 16px;
+            padding: 8px 18px;
             border-radius: 100px;
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            color: var(--accent-cyan);
             font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
+            font-weight: 600;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 28px;
-            backdrop-filter: blur(12px);
-        }
-
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-cyan);
-        }
-
-        .hero-headline {
-            font-size: clamp(42px, 7vw, 76px);
-            font-weight: 900;
-            letter-spacing: -0.04em;
-            line-height: 1.05;
-            color: var(--text-white);
-            max-width: 900px;
-            margin-bottom: 24px;
-        }
-
-        .hero-headline .cyan-accent {
-            color: var(--accent-cyan);
-            text-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
-        }
-
-        .hero-subheadline {
-            font-size: 18px;
-            line-height: 1.6;
             color: var(--text-muted);
-            max-width: 680px;
-            margin-bottom: 44px;
-            font-weight: 400;
+            margin-bottom: 32px;
         }
 
-        /* Hero Actions */
-        .hero-buttons {
+        .headline {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            line-height: 0.98;
+            margin-bottom: 28px;
+        }
+
+        .headline .cyan-accent {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 40px rgba(0, 229, 255, 0.35);
+        }
+
+        .subtext {
+            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 640px;
+            margin-bottom: 44px;
+        }
+
+        /* Magnetic Buttons */
+        .hero-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        .btn-primary {
+        .btn-magnetic-primary {
             background: var(--accent-cyan);
             color: #050505;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
-            letter-spacing: 0.02em;
-            padding: 16px 36px;
-            border-radius: 14px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 18px 40px;
+            border-radius: 100px;
             border: none;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 10px 30px var(--accent-glow), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 45px rgba(0, 229, 255, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        .btn-magnetic-primary:hover {
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 20px 50px rgba(0, 229, 255, 0.5);
             background: #26ecff;
         }
 
-        .btn-secondary {
-            background: rgba(17, 20, 27, 0.6);
+        .btn-magnetic-secondary {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 18px 40px;
+            border-radius: 100px;
             color: var(--text-white);
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            padding: 16px 36px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            cursor: pointer;
             text-decoration: none;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .btn-secondary:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.28);
-            background: rgba(25, 30, 40, 0.8);
-            box-shadow: 0 22px 45px rgba(0, 0, 0, 0.6);
+        .btn-magnetic-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- STATS SECTION --- */
-        .stats-grid {
+        /* Telemetry Cards */
+        .telemetry-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-            margin-bottom: 60px;
-            width: 100%;
+            margin-bottom: 80px;
         }
 
-        .stat-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 36px 28px;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        .telemetry-card {
+            border-radius: 28px;
+            padding: 28px;
         }
 
-        .stat-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--card-border-hover);
-            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.15);
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--text-white);
-            letter-spacing: -0.03em;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stat-subtext {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-            line-height: 1.4;
-        }
-
-        .stat-card-glow {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        /* --- FOOTER --- */
         .footer {
-            padding: 32px 0;
+            padding: 40px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
-            align-items: center;
             justify-content: space-between;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
+            font-family: monospace;
         }
 
-        .footer-brand {
-            font-weight: 600;
-            color: var(--text-white);
-        }
-
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        @media (max-width: 900px) {
-            .stats-grid {
+        @media (max-width: 768px) {
+            .telemetry-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .hero-headline {
-                font-size: 42px;
-            }
-
-            .hero-subheadline {
-                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Faint Dot Grid Pattern Background -->
-    <div class="bg-dot-grid"></div>
+    <!-- Fixed Film Grain Overlay -->
+    <div class="film-grain"></div>
 
-    <!-- Soft Radial Glow Backdrop -->
+    <!-- Deep Ambient Radial Glow -->
     <div class="ambient-glow"></div>
 
-    <!-- Main Spatial Application Container -->
-    <div class="app-container">
-
-        <!-- Top Floating Navigation -->
-        <nav class="navbar float-anim">
+    <!-- Top Minimal Floating Dock -->
+    <div class="nav-wrapper">
+        <nav class="navbar true-glass">
             <a href="#" class="logo">
-                <span class="logo-icon"></span>
-                <span>GLA UNIVERSITY</span>
+                <span class="logo-dot"></span>
+                <span>GLA NETWORK</span>
             </a>
-
-            <ul class="nav-links">
-                <li class="nav-link"><a href="#report">Report Item</a></li>
-                <li class="nav-link"><a href="#browse">Browse Found</a></li>
-                <li class="nav-link"><a href="#guidelines">Guidelines</a></li>
-            </ul>
-
-            <a href="#login" class="btn-login">Student Login</a>
+            <a href="#login" class="btn-access">Student Access</a>
         </nav>
+    </div>
 
-        <!-- Main Hero Section -->
+    <!-- Main App Container -->
+    <div class="app-container">
         <main class="hero">
-            <!-- Anti-Gravity Badge -->
-            <div class="badge float-anim-delayed">
-                <span class="badge-dot"></span>
-                <span>Official Campus Network</span>
+            <div class="badge true-glass drift-6">
+                <span style="color: var(--accent-cyan);">&bull;</span> Official Campus Recovery Network
             </div>
 
-            <!-- Main Massive Headline -->
-            <h1 class="hero-headline float-anim">
-                Campus <span class="cyan-accent">Lost & Found.</span>
+            <h1 class="headline drift-8">
+                GLA <span class="cyan-accent">Lost &amp; Found.</span>
             </h1>
 
-            <!-- Hero Subheadline -->
-            <p class="hero-subheadline float-anim-delayed">
-                A fast, secure, and effortless way to recover your misplaced items. Float a request to the campus network, or help a fellow student by reporting a found item.
+            <p class="subtext drift-12">
+                Reclaim your lost items. Effortless, secure, campus-wide recovery.
             </p>
 
-            <!-- Hero Call to Action Buttons -->
-            <div class="hero-buttons float-anim">
-                <a href="#report" class="btn-primary">Report Lost Item</a>
-                <a href="#browse" class="btn-secondary">Search Database</a>
+            <div class="hero-actions drift-6">
+                <a href="#report" class="btn-magnetic-primary">Report an Item</a>
+                <a href="#search" class="btn-magnetic-secondary true-glass">Search Network</a>
             </div>
         </main>
 
-        <!-- Bottom Stats Row (3 Columns) -->
-        <section class="stats-grid">
-            <!-- Column 1 -->
-            <div class="stat-card float-anim">
-                <div class="stat-card-glow"></div>
-                <div class="stat-number">100% Campus Verified</div>
-                <div class="stat-subtext">Monitored by GLA Administration</div>
+        <section class="telemetry-grid">
+            <div class="telemetry-card true-glass drift-6">
+                <h4 style="font-size: 16px; margin-bottom: 6px;">100% Campus Verified</h4>
+                <p style="font-size: 13px; color: var(--text-muted);">Monitored by GLA Administration</p>
             </div>
-
-            <!-- Column 2 -->
-            <div class="stat-card float-anim-delayed">
-                <div class="stat-card-glow"></div>
-                <div class="stat-number">&lt; 24h Average Match</div>
-                <div class="stat-subtext">Fast recovery notifications</div>
+            <div class="telemetry-card true-glass drift-8">
+                <h4 style="font-size: 16px; margin-bottom: 6px;">&lt; 24h Match Speed</h4>
+                <p style="font-size: 13px; color: var(--text-muted);">Real-time recovery notifications</p>
             </div>
-
-            <!-- Column 3 -->
-            <div class="stat-card float-anim">
-                <div class="stat-card-glow"></div>
-                <div class="stat-number">Secure &amp; Private</div>
-                <div class="stat-subtext">Your student details stay hidden</div>
+            <div class="telemetry-card true-glass drift-12">
+                <h4 style="font-size: 16px; margin-bottom: 6px;">Encrypted &amp; Private</h4>
+                <p style="font-size: 13px; color: var(--text-muted);">Student identity protection</p>
             </div>
         </section>
 
-        <!-- Minimal Footer -->
         <footer class="footer">
-            <div class="footer-brand">&copy; GLA University Lost & Found</div>
-            <div>Aetherium Anti-Gravity Spatial UX</div>
+            <div>&copy; GLA UNIVERSITY LOST &amp; FOUND</div>
+            <div>AETHERIUM $5k AGENCY UX</div>
         </footer>
-
     </div>
-
-    <!-- Minimal Interactive JavaScript -->
-    <script>
-        // Smooth parallax interactive effect on mouse movement
-        document.addEventListener('mousemove', (e) => {
-            const { clientX, clientY } = e;
-            const moveX = (clientX - window.innerWidth / 2) * 0.01;
-            const moveY = (clientY - window.innerHeight / 2) * 0.01;
-
-            const cards = document.querySelectorAll('.stat-card');
-            cards.forEach((card, index) => {
-                const factor = (index + 1) * 0.5;
-                card.style.transform = `translate3d(${moveX * factor}px, ${moveY * factor}px, 0)`;
-            });
-        });
-    </script>
 </body>
 </html>
