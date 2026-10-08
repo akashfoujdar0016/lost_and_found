@@ -177,7 +177,7 @@ const StudentDashboard = () => {
                     {/* Stat Card 2 */}
                     <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-xs font-semibold text-slate-400 tracking-wider">Campus Network</span>
+                            <span className="text-xs font-semibold text-slate-400 tracking-wider">Campus Items</span>
                             <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Synced</span>
                         </div>
                         <div className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
@@ -333,7 +333,7 @@ const StudentDashboard = () => {
                     <div className="lg:col-span-4 space-y-6">
                         <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)] space-y-6">
                             <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
-                                <h3 className="text-xs font-bold text-white tracking-wide uppercase">Category Telemetry</h3>
+                                <h3 className="text-xs font-bold text-white tracking-wide uppercase">Category Breakdown</h3>
                                 <Sparkles size={16} className="text-[#00E5FF]" />
                             </div>
 

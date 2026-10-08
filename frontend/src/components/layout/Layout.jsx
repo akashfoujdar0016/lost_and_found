@@ -49,7 +49,7 @@ export const Layout = ({ children }) => {
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
                         <div className="w-2.5 h-2.5 rounded-full bg-[#00E5FF] shadow-[0_0_12px_#00E5FF]"></div>
                         <span className="font-extrabold text-xs tracking-[0.2em] text-white uppercase">
-                            GLA <span className="text-[#00E5FF]">NETWORK</span>
+                            GLA <span className="text-[#00E5FF]">LOST &amp; FOUND</span>
                         </span>
                     </div>
 

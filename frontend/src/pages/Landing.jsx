@@ -129,7 +129,7 @@ const Landing = () => {
                             <span className="absolute w-5 h-5 rounded-full bg-[#00E5FF]/30 animate-ping"></span>
                         </div>
                         <span className="font-extrabold text-sm tracking-[0.2em] text-white uppercase group-hover:text-[#00E5FF] transition-colors">
-                            GLA <span className="text-[#00E5FF]">NETWORK</span>
+                            GLA <span className="text-[#00E5FF]">LOST &amp; FOUND</span>
                         </span>
                     </div>
 
@@ -178,7 +178,7 @@ const Landing = () => {
             {mobileMenuOpen && (
                 <div className="fixed inset-x-4 top-24 z-40 p-6 rounded-3xl true-glass border border-white/10 shadow-2xl flex flex-col gap-4 sm:hidden animate-in fade-in slide-in-from-top-4">
                     <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2 border-b border-white/5">How It Works</a>
-                    <a href="#telemetry-feed" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2 border-b border-white/5">Live Telemetry Feed</a>
+                    <a href="#telemetry-feed" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2 border-b border-white/5">Recent Items Feed</a>
                     <a href="#categories" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2 border-b border-white/5">Categories</a>
                     <a href="#trust-security" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2 border-b border-white/5">Campus Security & Trust</a>
                     <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold text-slate-300 py-2">Frequently Asked Questions</a>
@@ -295,7 +295,7 @@ const Landing = () => {
                         <div>
                             <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#00E5FF] mb-2">
                                 <span className="w-2 h-2 rounded-full bg-[#00E5FF] animate-ping"></span>
-                                Live System Telemetry
+                                Live Item Feed
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Recently Reported Belongings</h2>
                         </div>
@@ -367,7 +367,7 @@ const Landing = () => {
                         <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#00E5FF]">
                             3-Step Recovery Architecture
                         </div>
-                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">How GLA Network Works</h2>
+                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">How GLA Lost &amp; Found Works</h2>
                         <p className="text-slate-400 text-base sm:text-lg">
                             Engineered for maximum security, speed, and privacy across all GLA academic blocks & hostels.
                         </p>
