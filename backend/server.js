@@ -36,7 +36,9 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// MongoDB Connection
+// Mongoose Configuration & Connection
+mongoose.set('bufferCommands', false);
+
 const mongodbUri = process.env.MONGODB_URI;
 if (!mongodbUri) {
     console.error('MONGODB_URI is not defined in .env file');
@@ -45,6 +47,19 @@ if (!mongodbUri) {
         .then(() => console.log('Connected to MongoDB'))
         .catch(err => console.error('MongoDB connection error:', err));
 }
+
+// Database Connection Health Middleware
+const checkDbConnection = (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        if (process.env.MONGODB_URI && mongoose.connection.readyState === 0) {
+            mongoose.connect(process.env.MONGODB_URI).catch(() => {});
+        }
+        return res.status(503).json({
+            error: 'Database connection unavailable. Please ensure MONGODB_URI environment variable is configured in Vercel settings and MongoDB Atlas IP whitelist includes 0.0.0.0/0.'
+        });
+    }
+    next();
+};
 
 // Health Check Route (responds to both /api/health and /health)
 app.get(['/api/health', '/health'], async (req, res) => {
@@ -236,7 +251,7 @@ app.post(['/api/upload', '/upload'], verifyToken, async (req, res) => {
 });
 
 // Authentication Routes
-app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
+app.post(['/api/auth/register', '/auth/register'], checkDbConnection, async (req, res) => {
     try {
         const { email, password, name, role, identifier, universityEmail, personalEmail, ...rest } = req.body;
         
@@ -297,7 +312,7 @@ app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
     }
 });
 
-app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
+app.post(['/api/auth/login', '/auth/login'], checkDbConnection, async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
