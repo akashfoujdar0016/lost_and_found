@@ -41,43 +41,77 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Mongoose Configuration & Connection
+// Mongoose Configuration & Connection Caching Helper for Serverless
 mongoose.set('bufferCommands', false);
 
-const mongodbUri = process.env.MONGODB_URI;
-if (!mongodbUri) {
-    console.error('MONGODB_URI is not defined in .env file');
-} else {
-    mongoose.connect(mongodbUri)
-        .then(() => console.log('Connected to MongoDB'))
-        .catch(err => console.error('MongoDB connection error:', err));
-}
+let cachedDbPromise = null;
 
-// Database Connection Health Middleware
-const checkDbConnection = (req, res, next) => {
-    if (mongoose.connection.readyState !== 1) {
-        if (process.env.MONGODB_URI && mongoose.connection.readyState === 0) {
-            mongoose.connect(process.env.MONGODB_URI).catch(() => {});
-        }
-        return res.status(503).json({
-            error: 'Database connection unavailable. Please ensure MONGODB_URI environment variable is configured in Vercel settings and MongoDB Atlas IP whitelist includes 0.0.0.0/0.'
+const connectToDatabase = async () => {
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
+    }
+
+    const mongodbUri = process.env.MONGODB_URI;
+    if (!mongodbUri) {
+        throw new Error('MONGODB_URI environment variable is not defined in Vercel settings.');
+    }
+
+    if (!cachedDbPromise) {
+        cachedDbPromise = mongoose.connect(mongodbUri, {
+            serverSelectionTimeoutMS: 10000
         });
     }
-    next();
+
+    try {
+        await cachedDbPromise;
+    } catch (err) {
+        cachedDbPromise = null;
+        throw err;
+    }
+
+    return mongoose.connection;
+};
+
+// Database Connection Health Middleware
+const checkDbConnection = async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (error) {
+        console.error('Database Connection Failure:', error);
+        return res.status(503).json({
+            error: error.message || 'Database connection unavailable. Please check MONGODB_URI environment variable in Vercel settings.'
+        });
+    }
 };
 
 // Health Check Route (responds to both /api/health and /health)
 app.get(['/api/health', '/health'], async (req, res) => {
-    res.json({
-        status: 'ok',
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        readyState: mongoose.connection.readyState,
-        env: {
-            has_mongo_uri: !!process.env.MONGODB_URI,
-            has_jwt_secret: !!process.env.JWT_SECRET,
-            node_env: process.env.NODE_ENV?.trim()
-        }
-    });
+    try {
+        await connectToDatabase();
+        res.json({
+            status: 'ok',
+            database: 'connected',
+            readyState: mongoose.connection.readyState,
+            env: {
+                has_mongo_uri: !!process.env.MONGODB_URI,
+                has_jwt_secret: !!process.env.JWT_SECRET,
+                node_env: process.env.NODE_ENV?.trim()
+            }
+        });
+    } catch (err) {
+        res.json({
+            status: 'degraded',
+            database: 'disconnected',
+            error: err.message,
+            readyState: mongoose.connection.readyState,
+            env: {
+                has_mongo_uri: !!process.env.MONGODB_URI,
+                has_jwt_secret: !!process.env.JWT_SECRET,
+                node_env: process.env.NODE_ENV?.trim()
+            }
+        });
+    }
 });
 
 // --- Routes ---
