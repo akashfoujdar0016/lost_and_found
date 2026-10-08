@@ -14,7 +14,12 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+app.options('*', cors());
 app.use(express.json({ limit: '50mb' }));
 
 // Auth Middleware
@@ -251,7 +256,7 @@ app.post(['/api/upload', '/upload'], verifyToken, async (req, res) => {
 });
 
 // Authentication Routes
-app.post(['/api/auth/register', '/auth/register'], checkDbConnection, async (req, res) => {
+app.post(['/api/auth/register', '/auth/register', '/register'], checkDbConnection, async (req, res) => {
     try {
         const { email, password, name, role, identifier, universityEmail, personalEmail, ...rest } = req.body;
         
@@ -312,7 +317,7 @@ app.post(['/api/auth/register', '/auth/register'], checkDbConnection, async (req
     }
 });
 
-app.post(['/api/auth/login', '/auth/login'], checkDbConnection, async (req, res) => {
+app.post(['/api/auth/login', '/auth/login', '/login'], checkDbConnection, async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
