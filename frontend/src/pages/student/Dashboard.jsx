@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import { getItems } from '../../services/lostfound.service';
 import { getMatchRecommendations } from '../../services/matching.service';
-import { FileText, Zap, Search, ArrowUpRight, Plus, CheckCircle2, Clock, Sparkles } from 'lucide-react';
+import { FileText, Zap, ArrowUpRight, Plus, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -99,25 +99,25 @@ const StudentDashboard = () => {
 
     return (
         <Layout>
-            <div className="space-y-12 animate-fade-in">
+            <div className="space-y-[clamp(1.5rem,4vw,3rem)] animate-fade-in">
                 {/* Hero Greeting & Floating Primary Action */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-slate-300">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.05] text-xs font-semibold text-slate-300">
                             <span className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF] animate-pulse"></span>
                             <span>System Online • Student Portal</span>
                         </div>
-                        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                        <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black text-white tracking-tight leading-tight">
                             Welcome back, <span className="text-[#00E5FF]">{user?.name?.split(' ')[0] || 'Student'}</span>
                         </h1>
-                        <p className="text-slate-400 text-sm font-medium max-w-xl">
+                        <p className="text-slate-400 text-xs sm:text-sm font-medium max-w-xl">
                             Track your active items, review administrative verification matches, or float a new lost report to the campus network.
                         </p>
                     </div>
 
                     <button
                         onClick={() => navigate('/student/report')}
-                        className="self-start md:self-auto inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#00E5FF] text-slate-950 font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_15px_35px_rgba(0,229,255,0.35)] hover:shadow-[0_25px_50px_rgba(0,229,255,0.5)] hover:-translate-y-1 active:scale-95 shrink-0"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#00E5FF] text-slate-950 font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_15px_35px_rgba(0,229,255,0.35)] hover:shadow-[0_25px_50px_rgba(0,229,255,0.5)] active:scale-95 shrink-0"
                     >
                         <Plus size={16} strokeWidth={3} />
                         <span>Report Misplaced Item</span>
@@ -126,7 +126,7 @@ const StudentDashboard = () => {
 
                 {/* Levitating Auto-Match Banner (If match found) */}
                 {matches.length > 0 && (
-                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-[#00E5FF]/30 p-6 md:p-8 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-300 hover:border-[#00E5FF]/60 hover:-translate-y-1">
+                    <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,2rem)] flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex items-start gap-4">
                             <div className="w-12 h-12 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center text-[#00E5FF] shrink-0">
                                 <Zap size={22} className="animate-bounce" />
@@ -135,7 +135,7 @@ const StudentDashboard = () => {
                                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#00E5FF]">
                                     AI Match Detected
                                 </span>
-                                <h3 className="text-lg font-bold text-white">
+                                <h3 className="text-base sm:text-lg font-bold text-white">
                                     Potential match found for "{matches[0].lostItem?.title}"
                                 </h3>
                                 <p className="text-xs text-slate-400 font-medium">
@@ -155,32 +155,32 @@ const StudentDashboard = () => {
                 )}
 
                 {/* Minimalist Data Visualizers (Weightless Stat Row) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     {/* Stat Card 1 */}
-                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                    <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-xs font-semibold text-slate-400 tracking-wider">My Submissions</span>
                             <div className="w-2 h-2 rounded-full bg-[#00E5FF] shadow-[0_0_10px_#00E5FF]"></div>
                         </div>
-                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                        <div className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
                             {myReports.length}
                         </div>
                         <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                             <div
                                 className="bg-[#00E5FF] h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_#00E5FF]"
-                                style={{ width: `${Math.min(myReports.length * 20, 100)}%` }}
+                                style={{ width: `${Math.min(myReports.length * 25, 100)}%` }}
                             ></div>
                         </div>
                         <p className="text-[11px] text-slate-400 font-medium mt-3">Items reported by your account</p>
                     </div>
 
                     {/* Stat Card 2 */}
-                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                    <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-xs font-semibold text-slate-400 tracking-wider">Campus Network</span>
                             <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Synced</span>
                         </div>
-                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                        <div className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
                             {recentItems.length + myReports.length}
                         </div>
                         <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
@@ -190,12 +190,12 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Stat Card 3 */}
-                    <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-[#00E5FF]/30 hover:shadow-[0_30px_60px_-15px_rgba(0,229,255,0.15)] group">
+                    <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-xs font-semibold text-slate-400 tracking-wider">Recovery Efficiency</span>
                             <span className="text-[10px] font-mono text-[#00E5FF]">94.2%</span>
                         </div>
-                        <div className="text-4xl font-black text-white tracking-tight mb-3">
+                        <div className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
                             &lt; 24h
                         </div>
                         <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
@@ -206,14 +206,14 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Main Content Layout: Floating Reports List & Telemetry Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column: My Submissions & Recent Feed */}
-                    <div className="lg:col-span-8 space-y-10">
+                    <div className="lg:col-span-8 space-y-8">
                         {/* Section: My Submissions */}
-                        <div className="space-y-5">
+                        <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-lg font-extrabold text-white tracking-tight">My Active Submissions</h2>
+                                    <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight">My Active Submissions</h2>
                                     <p className="text-xs text-slate-400">Items you logged onto the university network</p>
                                 </div>
                                 <Link
@@ -232,7 +232,7 @@ const StudentDashboard = () => {
                                     ))}
                                 </div>
                             ) : myReports.length === 0 ? (
-                                <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-10 text-center space-y-4">
+                                <div className="anti-gravity-card rounded-3xl p-8 text-center space-y-4">
                                     <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
                                         <FileText size={22} />
                                     </div>
@@ -252,17 +252,17 @@ const StudentDashboard = () => {
                                     {myReports.map(item => (
                                         <div
                                             key={item.id || item._id}
-                                            className="rounded-2xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-4 flex items-center justify-between gap-4 transition-all duration-400 hover:border-[#00E5FF]/30 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-10px_rgba(0,229,255,0.12)] group"
+                                            className="anti-gravity-card rounded-2xl p-4 flex items-center justify-between gap-4 group"
                                         >
                                             <div className="flex items-center gap-4 min-w-0">
-                                                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+                                                <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
                                                     {getEmojiForCategory(item.category)}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
+                                                    <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
                                                         {item.title}
                                                     </h4>
-                                                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
                                                         <span className="capitalize">{item.category}</span>
                                                         <span>•</span>
                                                         <span className="truncate">{item.location || 'GLA Campus'}</span>
@@ -288,10 +288,10 @@ const StudentDashboard = () => {
                         </div>
 
                         {/* Section: Campus Activity Stream */}
-                        <div className="space-y-5">
+                        <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-lg font-extrabold text-white tracking-tight">Campus Activity Stream</h2>
+                                    <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight">Campus Activity Stream</h2>
                                     <p className="text-xs text-slate-400">Recent misplaced items reported across GLA campus</p>
                                 </div>
                                 <Link
@@ -315,18 +315,18 @@ const StudentDashboard = () => {
                                         <div
                                             key={item.id || item._id}
                                             onClick={() => navigate('/student/search')}
-                                            className="rounded-2xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-4 flex items-center justify-between gap-4 transition-all duration-400 hover:border-[#00E5FF]/30 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-10px_rgba(0,229,255,0.12)] cursor-pointer group"
+                                            className="anti-gravity-card rounded-2xl p-4 flex items-center justify-between gap-4 cursor-pointer group"
                                         >
                                             <div className="flex items-center gap-4 min-w-0">
-                                                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+                                                <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
                                                     {getEmojiForCategory(item.category)}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
+                                                    <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00E5FF] transition-colors">
                                                         {item.title}
                                                     </h4>
-                                                    <p className="text-xs text-slate-400 truncate mt-0.5">
-                                                        {item.location || 'GLA Campus'} • Reported by {item.reportedBy?.name || 'Student'}
+                                                    <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                                        {item.location || 'GLA Campus'} • By {item.reportedBy?.name || 'Student'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -346,15 +346,15 @@ const StudentDashboard = () => {
 
                     {/* Right Column: Sleek Data Insights Track */}
                     <div className="lg:col-span-4 space-y-6">
-                        <div className="rounded-3xl bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.05] p-7 shadow-[0_30px_60px_-15px_rgba(0,229,255,0.06)] space-y-6">
+                        <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)] space-y-6">
                             <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
-                                <h3 className="text-sm font-bold text-white tracking-wide uppercase">Category Telemetry</h3>
+                                <h3 className="text-xs font-bold text-white tracking-wide uppercase">Category Telemetry</h3>
                                 <Sparkles size={16} className="text-[#00E5FF]" />
                             </div>
 
                             <div className="space-y-4">
                                 {categoryBreakdown.length > 0 ? (
-                                    categoryBreakdown.map((cat, idx) => (
+                                    categoryBreakdown.map((cat) => (
                                         <div key={cat.name} className="space-y-2">
                                             <div className="flex justify-between items-center text-xs">
                                                 <span className="font-semibold text-slate-300">{cat.name}</span>
