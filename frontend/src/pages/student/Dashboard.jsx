@@ -155,7 +155,7 @@ const StudentDashboard = () => {
                 )}
 
                 {/* Minimalist Data Visualizers (Weightless Stat Row) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {/* Stat Card 1 */}
                     <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
                         <div className="flex items-center justify-between mb-4">
@@ -187,21 +187,6 @@ const StudentDashboard = () => {
                             <div className="bg-emerald-400 h-full rounded-full w-4/5 shadow-[0_0_10px_#10b981]"></div>
                         </div>
                         <p className="text-[11px] text-slate-400 font-medium mt-3">Active database entries</p>
-                    </div>
-
-                    {/* Stat Card 3 */}
-                    <div className="anti-gravity-card rounded-3xl p-[clamp(1.25rem,3vw,1.75rem)]">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-xs font-semibold text-slate-400 tracking-wider">Recovery Efficiency</span>
-                            <span className="text-[10px] font-mono text-[#00E5FF]">94.2%</span>
-                        </div>
-                        <div className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
-                            &lt; 24h
-                        </div>
-                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-[#00E5FF] h-full rounded-full w-11/12 shadow-[0_0_10px_#00E5FF]"></div>
-                        </div>
-                        <p className="text-[11px] text-slate-400 font-medium mt-3">Average match &amp; audit turnaround</p>
                     </div>
                 </div>
 
